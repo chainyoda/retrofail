@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetroFail — Retrosynthesis Route Planning Benchmark</title>
+<style>
+  :root {
+    --bg: #fdf9f0;
+    --fg: #1f2a24;
+    --muted: #5c6b62;
+    --accent: #1f5a3d;
+    --pop: #e56b52;
+    --rule: #d9d0bc;
+    --code-bg: #f2ecda;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    line-height: 1.65;
+    background: var(--bg);
+    color: var(--fg);
+  }
+  header {
+    border-bottom: 2px solid var(--rule);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+  }
+  header nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.85rem;
+  }
+  header nav a:hover { color: var(--pop); }
+  main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 6rem; }
+  h2 {
+    font-size: 1.1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin: 2.5rem 0 0.8rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.3rem;
+  }
+  p { margin: 0.7rem 0; }
+  code {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    background: var(--code-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    font-size: 0.88em;
+  }
+  pre {
+    background: var(--code-bg);
+    padding: 1rem 1.2rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    border-left: 3px solid var(--pop);
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  pre code { background: transparent; padding: 0; }
+  a { color: var(--pop); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+  /* Score formula */
+  .formula {
+    background: var(--code-bg);
+    border-left: 3px solid var(--accent);
+    padding: 1rem 1.2rem;
+    border-radius: 4px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  /* Leaderboard */
+  .board {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  .board th {
+    text-align: left;
+    padding: 0.4rem 0.8rem;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 2px solid var(--rule);
+  }
+  .board td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  .board tr:last-child td { border-bottom: none; }
+  .board tr:hover td { background: #f5f0e4; }
+  .rank { color: var(--muted); font-size: 0.8rem; }
+  .score-val { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 0.1em 0.5em;
+    border-radius: 3px;
+    background: var(--code-bg);
+    color: var(--muted);
+    font-family: -apple-system, sans-serif;
+    letter-spacing: 0.04em;
+  }
+  .tag.protac { background: #e8f0eb; color: #2a6b3e; }
+  .tag.macro { background: #f0e8e8; color: #8b3a2a; }
+  .tag.ha { background: #e8eaf0; color: #2a3a6b; }
+
+  /* Progress bar */
+  .progress-wrap { margin: 1rem 0; }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: -apple-system, sans-serif;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+  .progress-bar {
+    height: 8px;
+    background: var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  /* Stat cards */
+  .stats { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+  .stat {
+    flex: 1;
+    min-width: 140px;
+    background: var(--code-bg);
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--rule);
+  }
+  .stat-val {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .stat-label {
+    font-family: -apple-system, sans-serif;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 0.2rem;
+  }
+
+  /* Targets table */
+  .targets {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78rem;
+    margin-top: 0.5rem;
+  }
+  .targets th {
+    text-align: left;
+    padding: 0.3rem 0.6rem;
+    color: var(--muted);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 2px solid var(--rule);
+    font-family: -apple-system, sans-serif;
+    font-weight: 600;
+  }
+  .targets td {
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid var(--rule);
+    word-break: break-all;
+  }
+  .targets tr:hover td { background: #f5f0e4; }
+
+  #loading { color: var(--muted); font-style: italic; font-family: -apple-system, sans-serif; font-size: 0.9rem; }
+  #error { color: var(--pop); font-family: -apple-system, sans-serif; font-size: 0.9rem; display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>RetroFail</h1>
+  <nav>
+    <a href="#how">How it works</a> &nbsp;·&nbsp;
+    <a href="#leaderboard">Leaderboard</a> &nbsp;·&nbsp;
+    <a href="#targets">Public targets</a> &nbsp;·&nbsp;
+    <a href="https://github.com/chainyoda/retrofail" target="_blank">GitHub</a>
+  </nav>
+</header>
+
+<main>
+
+<p style="margin-top:1.5rem">
+  Given a target small molecule as canonical SMILES, produce a synthetic route from commercially available building blocks. Scope: <strong>PROTAC linkers</strong> and <strong>macrocycles</strong> — chemotypes where current tools visibly underperform.
+</p>
+
+<h2 id="how">Scoring</h2>
+<div class="formula">score = solve_rate<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ 0.10 &times; mean_route_efficiency<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&minus; 0.01 &times; mean_wall_clock_seconds</div>
+
+<p>Higher is better. <code>solve_rate</code> is the fraction of hidden targets with a valid route. A submission is only promoted if it strictly improves on the current best.</p>
+
+<h2>Current frontier</h2>
+<div id="stats-loading" class="stats">
+  <div class="stat"><div class="stat-val" id="best-score">—</div><div class="stat-label">Best score</div></div>
+  <div class="stat"><div class="stat-val" id="best-solve">—</div><div class="stat-label">Solve rate</div></div>
+  <div class="stat"><div class="stat-val" id="n-submissions">—</div><div class="stat-label">Submissions</div></div>
+  <div class="stat"><div class="stat-val" id="n-promoted">—</div><div class="stat-label">Promoted</div></div>
+</div>
+
+<div class="progress-wrap" id="progress-wrap" style="display:none">
+  <div class="progress-label">
+    <span>Solve rate</span>
+    <span id="progress-label-right">0 / 100</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+</div>
+
+<h2 id="leaderboard">Leaderboard</h2>
+<span id="loading">Loading...</span>
+<span id="error">Could not load leaderboard — is the server running?</span>
+<table class="board" id="board" style="display:none">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Score</th>
+      <th>Solve rate</th>
+      <th>Efficiency</th>
+      <th>Wall clock</th>
+      <th>Submitted by</th>
+      <th>Note</th>
+    </tr>
+  </thead>
+  <tbody id="board-body"></tbody>
+</table>
+<p id="board-empty" style="display:none;color:var(--muted);font-style:italic;font-family:-apple-system,sans-serif;font-size:0.9rem">
+  No promoted submissions yet. Be the first.
+</p>
+
+<h2 id="targets">Public targets <span style="font-weight:400;font-size:0.85rem;color:var(--muted)">(10 of 110)</span></h2>
+<p style="font-family:-apple-system,sans-serif;font-size:0.85rem;color:var(--muted)">
+  The hidden set (100 targets) is held server-side. Hidden set SHA-256 prefix: <code id="hidden-hash">—</code>
+</p>
+<table class="targets" id="targets-table">
+  <thead><tr><th>ID</th><th>SMILES</th><th>Chemotype</th></tr></thead>
+  <tbody id="targets-body"></tbody>
+</table>
+
+<h2>Participate</h2>
+<pre><code># 1. Register and get an API key at /auth/register?name=yourname
+# 2. Clone the benchmark
+python3 cli/retrofail.py login &lt;api-key&gt;
+python3 cli/retrofail.py clone challenge
+cd challenge
+
+# 3. Edit solver/solve.py — implement solve(target_smiles) -> Route
+# 4. Test locally
+python3 cli/retrofail.py run
+
+# 5. Submit
+python3 cli/retrofail.py submit --note "approach description"</code></pre>
+
+<h2>Verifier</h2>
+<p>Every route is validated by a pinned RDKit-based verifier:</p>
+<ol style="font-family:-apple-system,sans-serif;font-size:0.9rem;line-height:1.8">
+  <li><strong>Parse.</strong> Every SMILES canonicalizes without error under a pinned RDKit version.</li>
+  <li><strong>Root match.</strong> The final step's product matches the target (canonical SMILES equality).</li>
+  <li><strong>Leaf availability.</strong> Every leaf reactant appears in the building block catalog.</li>
+  <li><strong>Depth bound.</strong> Route depth ≤ 10 steps.</li>
+  <li><strong>Budget.</strong> <code>solve()</code> returns within 60 seconds.</li>
+</ol>
+<p>A submission is rejected if its hidden-set score does not strictly exceed the current best.</p>
+
+</main>
+
+<script>
+// On Vercel: /api/* routes to serverless functions.
+// Locally with uvicorn: same host, no prefix needed.
+const API = '';
+
+async function loadLeaderboard() {
+  try {
+    const r = await fetch(`${API}/api/leaderboard`);
+    const data = await r.json();
+    const board = data.leaderboard || [];
+    const allSubs = data.all_count || board.length;
+
+    document.getElementById('loading').style.display = 'none';
+
+    // Stats
+    if (board.length > 0) {
+      const best = board[0];
+      const m = best.metrics || {};
+      document.getElementById('best-score').textContent = best.score.toFixed(4);
+      document.getElementById('best-solve').textContent = ((m.solve_rate || 0) * 100).toFixed(0) + '%';
+      const pct = (m.solve_rate || 0) * 100;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-label-right').textContent =
+        `${m.solved || 0} / ${m.total || 100}`;
+      document.getElementById('progress-wrap').style.display = 'block';
+    } else {
+      document.getElementById('best-score').textContent = '—';
+      document.getElementById('best-solve').textContent = '—';
+    }
+
+    // Fetch all submissions count
+    try {
+      const r2 = await fetch(`${API}/api/submissions?all=true`, {headers: {'Authorization': 'Bearer __public__'}});
+      if (r2.ok) {
+        const d2 = await r2.json();
+        document.getElementById('n-submissions').textContent = (d2.submissions || []).length;
+      }
+    } catch(_) {}
+
+    document.getElementById('n-promoted').textContent = board.length;
+
+    if (board.length === 0) {
+      document.getElementById('board-empty').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('board').style.display = 'table';
+    const tbody = document.getElementById('board-body');
+    tbody.innerHTML = '';
+    board.forEach((s, i) => {
+      const m = s.metrics || {};
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="rank">${i + 1}</td>
+        <td class="score-val">${s.score.toFixed(4)}</td>
+        <td>${((m.solve_rate || 0) * 100).toFixed(0)}%</td>
+        <td>${(m.mean_route_efficiency || 0).toFixed(3)}</td>
+        <td>${(m.mean_wall_clock_s || 0).toFixed(1)}s</td>
+        <td>${s.user || '—'}</td>
+        <td style="color:var(--muted);font-size:0.82rem">${s.note || ''}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = 'block';
+  }
+}
+
+async function loadTargets() {
+  try {
+    const r = await fetch(`${API}/api/targets`);
+    const data = await r.json();
+    const tbody = document.getElementById('targets-body');
+    tbody.innerHTML = '';
+    (data.targets || []).forEach(t => {
+      const tr = document.createElement('tr');
+      const ct = t.chemotype || '';
+      let tagCls = 'tag';
+      if (ct.includes('macrocycle')) tagCls += ' macro';
+      else if (ct.includes('ha')) tagCls += ' ha';
+      else tagCls += ' protac';
+      tr.innerHTML = `
+        <td><strong>${t.id}</strong></td>
+        <td>${t.smiles}</td>
+        <td><span class="${tagCls}">${ct}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    const mfr = data.manifest || {};
+    if (mfr.hidden_sha256) document.getElementById('hidden-hash').textContent = mfr.hidden_sha256;
+  } catch(_) {}
+}
+
+async function loadStats() {
+  try {
+    const r = await fetch(`${API}/api/leaderboard`);
+    const data = await r.json();
+    const promoted = (data.leaderboard || []).length;
+    document.getElementById('n-promoted').textContent = promoted;
+  } catch(_) {}
+}
+
+loadLeaderboard();
+loadTargets();
+</script>
+</body>
+</html>

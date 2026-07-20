@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/*.py", "use": "@vercel/python" },
+    { "src": "public/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/health", "dest": "/api/health.py" },
+    { "src": "/api/leaderboard", "dest": "/api/leaderboard.py" },
+    { "src": "/api/targets", "dest": "/api/targets.py" },
+    { "src": "/api/submissions", "dest": "/api/submissions.py" },
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ]
+}
