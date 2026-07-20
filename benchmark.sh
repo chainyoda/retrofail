@@ -34,8 +34,8 @@ elif [[ "$(uname -s)" == "Darwin" ]] && command -v sandbox-exec &>/dev/null; the
     /bin/bash -c "cd \"${SCRATCH}\" && TARGETS_FILE=\"${TARGETS_FILE}\" SOLVER_DIR=\"${SOLVER_DIR}\" python3 \"${SOLVER_DIR}/solve.py\"" \
     > "${SCRATCH}/route.json"
 else
-  echo "!! no sandbox available; running solver UNCONFINED (dev only)" >&2
-  TARGETS_FILE="${TARGETS_FILE}" SOLVER_DIR="${SOLVER_DIR}" \
+  echo "!! no sandbox available; running solver UNCONFINED" >&2
+  cd "${SCRATCH}" && TARGETS_FILE="${TARGETS_FILE}" SOLVER_DIR="${SOLVER_DIR}" \
     python3 "${SOLVER_DIR}/solve.py" > "${SCRATCH}/route.json"
 fi
 

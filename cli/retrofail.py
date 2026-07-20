@@ -154,8 +154,9 @@ def cmd_submit(args):
     solver_zip = buf.getvalue()
 
     print("submitting...")
+    from urllib.parse import quote
     result = post_multipart(
-        f"/submit?note={args.note or ''}&model={args.model or ''}",
+        f"/submit?note={quote(args.note or '')}&model={quote(args.model or '')}",
         fields={},
         files={"solver_zip": ("solver.zip", solver_zip)},
         headers=auth_header(),
