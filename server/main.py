@@ -145,10 +145,19 @@ async def submit(
         with zipfile.ZipFile(io.BytesIO(raw)) as zf:
             zf.extractall(solver_dir)
 
-        # Run the benchmark
+        # Use hidden targets on the server if available, public otherwise
+        hidden_targets = REPO_ROOT / "targets" / "hidden.csv"
+        if hidden_targets.exists():
+            shutil.copy2(hidden_targets, tmp / "targets" / "hidden.csv")
+            targets_arg = "targets/hidden.csv"
+        else:
+            targets_arg = "targets/public.csv"
+
+        # Run the benchmark against the appropriate target set
         t0 = time.time()
         result = subprocess.run(
-            ["bash", "benchmark.sh"],
+            ["bash", "-c",
+             f"TARGETS_FILE={targets_arg} bash benchmark.sh"],
             cwd=tmp,
             capture_output=True,
             text=True,
@@ -232,8 +241,19 @@ def get_public_targets():
     return {"targets": targets, "manifest": manifest}
 
 
-# ── Static frontend ───────────────────────────────────────────────────────────
+# ── CORS (allow Vercel frontend to call this API) ─────────────────────────────
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://retrofail.vercel.app", "http://localhost:8000", "http://localhost:3000"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
+)
+
+# ── Static frontend (local dev only — disabled in production) ─────────────────
 
 STATIC_DIR = Path(__file__).parent / "static"
-if STATIC_DIR.exists():
+if STATIC_DIR.exists() and not os.environ.get("STATIC_DISABLED"):
     app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="static")

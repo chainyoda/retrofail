@@ -7,7 +7,8 @@ set -euo pipefail
 rm -f route.json score.json
 
 SOLVER_DIR="$(pwd)/solver"
-TARGETS_FILE="$(pwd)/targets/public.csv"
+# Allow server to override with hidden targets via env var
+TARGETS_FILE="${TARGETS_FILE:-$(pwd)/targets/public.csv}"
 SCRATCH="$(mktemp -d)"
 
 cleanup() { rm -rf "${SCRATCH}"; }
