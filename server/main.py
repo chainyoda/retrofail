@@ -149,9 +149,9 @@ async def submit(
         hidden_targets = REPO_ROOT / "targets" / "hidden.csv"
         if hidden_targets.exists():
             shutil.copy2(hidden_targets, tmp / "targets" / "hidden.csv")
-            targets_arg = "targets/hidden.csv"
+            targets_arg = str(tmp / "targets" / "hidden.csv")
         else:
-            targets_arg = "targets/public.csv"
+            targets_arg = str(tmp / "targets" / "public.csv")
 
         # Run the benchmark against the appropriate target set
         t0 = time.time()
