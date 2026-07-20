@@ -14,8 +14,11 @@ import uuid
 import zipfile
 from pathlib import Path
 
+import csv
+
 from fastapi import FastAPI, Header, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 app = FastAPI(title="RetroFail API")
@@ -210,3 +213,27 @@ def leaderboard():
 @app.get("/health")
 def health():
     return {"ok": True}
+
+
+# ── Public targets + manifest ─────────────────────────────────────────────────
+
+@app.get("/targets/public")
+def get_public_targets():
+    targets_file = REPO_ROOT / "targets" / "public.csv"
+    manifest_file = REPO_ROOT / "targets" / "manifest.json"
+    targets = []
+    if targets_file.exists():
+        with open(targets_file) as f:
+            for row in csv.DictReader(f):
+                targets.append(row)
+    manifest = {}
+    if manifest_file.exists():
+        manifest = json.loads(manifest_file.read_text())
+    return {"targets": targets, "manifest": manifest}
+
+
+# ── Static frontend ───────────────────────────────────────────────────────────
+
+STATIC_DIR = Path(__file__).parent / "static"
+if STATIC_DIR.exists():
+    app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="static")
