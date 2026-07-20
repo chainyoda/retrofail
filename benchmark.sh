@@ -6,9 +6,10 @@ set -euo pipefail
 
 rm -f route.json score.json
 
-SOLVER_DIR="$(pwd)/solver"
+BENCH_DIR="$(pwd)"
+SOLVER_DIR="${BENCH_DIR}/solver"
 # Allow server to override with hidden targets via env var
-TARGETS_FILE="${TARGETS_FILE:-$(pwd)/targets/public.csv}"
+TARGETS_FILE="${TARGETS_FILE:-${BENCH_DIR}/targets/public.csv}"
 SCRATCH="$(mktemp -d)"
 
 cleanup() { rm -rf "${SCRATCH}"; }
@@ -43,9 +44,9 @@ if [[ ! -s "${SCRATCH}/route.json" ]]; then
   echo "!! solver produced no output" >&2; exit 1
 fi
 
-cp "${SCRATCH}/route.json" ./route.json
+cp "${SCRATCH}/route.json" "${BENCH_DIR}/route.json"
 
 # Stage 2 — trusted verifier (never imports solver code)
-python3 verifier/verify.py --routes route.json --targets "${TARGETS_FILE}" --output score.json
+python3 "${BENCH_DIR}/verifier/verify.py" --routes "${BENCH_DIR}/route.json" --targets "${TARGETS_FILE}" --output "${BENCH_DIR}/score.json"
 
-cat score.json
+cat "${BENCH_DIR}/score.json"
