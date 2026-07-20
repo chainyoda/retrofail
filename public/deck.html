@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetroFail — 2-Slide Deck</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 40px 20px;
+  }
+  .slide {
+    width: 960px;
+    height: 540px;
+    background: #fdf9f0;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .slide-hint {
+    color: #555;
+    font-size: 12px;
+    font-family: monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Slide 1 ── */
+  .s1 { padding: 52px 64px; }
+  .s1 .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #e56b52;
+    margin-bottom: 14px;
+  }
+  .s1 h1 {
+    font-size: 52px;
+    font-weight: 800;
+    color: #1f2a24;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-bottom: 10px;
+  }
+  .s1 .sub {
+    font-size: 19px;
+    color: #5c6b62;
+    margin-bottom: 36px;
+    line-height: 1.4;
+  }
+  .cards {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+  }
+  .card {
+    flex: 1;
+    background: #f2ecda;
+    border-radius: 6px;
+    padding: 20px 22px;
+    border-left: 3px solid #1f5a3d;
+  }
+  .card h3 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #1f5a3d;
+    margin-bottom: 8px;
+  }
+  .card p {
+    font-size: 13.5px;
+    color: #3a4a40;
+    line-height: 1.55;
+  }
+  .card p strong { color: #1f2a24; }
+
+  /* ── Slide 2 ── */
+  .s2 { padding: 0; flex-direction: row; }
+  .s2-left {
+    width: 340px;
+    background: #1f2a24;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .s2-left h2 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #fdf9f0;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .s2-left .tagline {
+    font-size: 14px;
+    color: #8fa898;
+    line-height: 1.5;
+  }
+  .s2-left .url {
+    font-size: 13px;
+    color: #e56b52;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    margin-top: auto;
+    padding-top: 32px;
+  }
+  .s2-right {
+    flex: 1;
+    padding: 40px 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .s2-right .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #e56b52;
+    margin-bottom: 4px;
+  }
+  .step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 26px;
+    height: 26px;
+    background: #1f5a3d;
+    color: #fdf9f0;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-body h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2a24;
+    margin-bottom: 2px;
+  }
+  .step-body p {
+    font-size: 12.5px;
+    color: #5c6b62;
+    line-height: 1.45;
+  }
+  .formula-box {
+    background: #f2ecda;
+    border-radius: 5px;
+    padding: 12px 16px;
+    border-left: 3px solid #e56b52;
+  }
+  .formula-box code {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: #1f2a24;
+    line-height: 1.7;
+    display: block;
+  }
+  .divider {
+    width: 1px;
+    background: #d9d0bc;
+    margin: 0 4px;
+    align-self: stretch;
+  }
+</style>
+</head>
+<body>
+
+<!-- Slide 1 -->
+<div class="slide s1">
+  <div class="eyebrow">Frontier Benchmark · Drug Discovery</div>
+  <h1>RetroFail</h1>
+  <p class="sub">Can AI plan better synthetic routes for the hardest molecules in drug discovery?</p>
+  <div class="cards">
+    <div class="card">
+      <h3>The Problem</h3>
+      <p>Given a target molecule, find a step-by-step synthesis from <strong>commercially available building blocks</strong>. Existing tools fail badly on <strong>PROTAC linkers</strong> and <strong>macrocycles</strong> — two chemotypes central to next-generation drugs.</p>
+    </div>
+    <div class="card">
+      <h3>The Opportunity</h3>
+      <p>PROTAC programs burn <strong>3–6 months and $500K–$2M</strong> per campaign on linker synthesis planning. A 10-point solve-rate improvement keeps ~20 drug programs alive per campaign that would otherwise be dropped as "unsynthesizable."</p>
+    </div>
+    <div class="card">
+      <h3>Why Now</h3>
+      <p>No open, executable benchmark exists for this chemotype. New ML retrosynthesis models (LocalRetro, Graph2Edits) are ready to be tested. A public leaderboard gives the field a <strong>single number to compete on</strong>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 2 -->
+<div class="slide s2">
+  <div class="s2-left">
+    <div>
+      <h2>How it works</h2>
+      <p class="tagline">A machine-verifiable benchmark with a single scalar score and a strict promotion rule.</p>
+    </div>
+    <div class="formula-box" style="background:#2a3a30;border-left-color:#e56b52">
+      <code style="color:#c8e6c9">score =</code>
+      <code style="color:#fdf9f0">&nbsp;&nbsp;solve_rate</code>
+      <code style="color:#fdf9f0">&nbsp;+ 0.10 × efficiency</code>
+      <code style="color:#fdf9f0">&nbsp;− 0.01 × wall_clock</code>
+    </div>
+    <div class="url">retrofail.vercel.app</div>
+  </div>
+  <div class="s2-right">
+    <div class="section-label">Compete in 4 steps</div>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Clone</h4>
+        <p>Get 10 public target SMILES + a pinned RDKit verifier. Test locally against the same scoring logic the server uses.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Implement <code style="font-size:12px;background:#f2ecda;padding:1px 5px;border-radius:3px">solve(smiles) → Route</code></h4>
+        <p>Any approach: SMARTS templates, MCTS, learned one-step model, LLM. Only the route JSON is evaluated.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Submit</h4>
+        <p>Server runs your solver against 100 hidden targets. Routes are validated: correct SMILES, purchasable leaves, depth ≤ 10, within 60s.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Promote (or don't)</h4>
+        <p>Your submission only hits the leaderboard if it <strong>strictly beats the current best</strong>. No gaming the public set.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
