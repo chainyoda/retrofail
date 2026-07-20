@@ -216,7 +216,13 @@ def leaderboard():
     subs = load_json(SUBMISSIONS_FILE, [])
     promoted = [s for s in subs if s.get("promoted")]
     promoted = sorted(promoted, key=lambda s: s["score"], reverse=True)
-    return {"leaderboard": promoted, "best": promoted[0] if promoted else None}
+    # Include public submission history (score + timestamp only, no user PII) for the chart
+    history = sorted(
+        [{"score": s["score"], "timestamp": s["timestamp"], "promoted": s.get("promoted", False)}
+         for s in subs],
+        key=lambda s: s["timestamp"]
+    )
+    return {"leaderboard": promoted, "best": promoted[0] if promoted else None, "history": history}
 
 
 @app.get("/health")

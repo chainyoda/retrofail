@@ -150,6 +150,34 @@
     transition: width 0.5s ease;
   }
 
+  /* Score history chart */
+  .chart-wrap {
+    margin: 1rem 0 0.5rem;
+    background: var(--code-bg);
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+    padding: 1rem 1.2rem 0.8rem;
+  }
+  .chart-title {
+    font-family: -apple-system, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+  }
+  .chart-svg { display: block; width: 100%; overflow: visible; }
+  .chart-legend {
+    display: flex;
+    gap: 1.2rem;
+    font-family: -apple-system, sans-serif;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.4rem;
+  }
+  .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+
   /* Stat cards */
   .stats { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
   .stat {
@@ -261,6 +289,16 @@
   <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
 </div>
 
+<div class="chart-wrap" id="chart-wrap" style="display:none">
+  <div class="chart-title">Score history</div>
+  <svg class="chart-svg" id="score-chart" height="120"></svg>
+  <div class="chart-legend">
+    <span><span class="legend-dot" style="background:var(--accent)"></span>Submissions</span>
+    <span><span class="legend-dot" style="background:var(--pop)"></span>Best (promoted)</span>
+    <span><span class="legend-dot" style="background:#aaa;border-radius:0;width:18px;height:2px;vertical-align:middle"></span>Retro* SOTA 86.8%</span>
+  </div>
+</div>
+
 <h2 id="leaderboard">Leaderboard</h2>
 <span id="loading">Loading...</span>
 <span id="error">Could not load leaderboard — is the server running?</span>
@@ -361,6 +399,81 @@ python3 cli/retrofail.py submit --note "approach description"</code></pre>
 const API = '';
 const JUDGE = 'https://retrofail-judge-production.up.railway.app';
 
+function drawChart(allSubs) {
+  if (!allSubs || allSubs.length === 0) return;
+  const wrap = document.getElementById('chart-wrap');
+  const svg = document.getElementById('score-chart');
+  wrap.style.display = 'block';
+
+  const W = svg.parentElement.clientWidth - 24; // account for padding
+  const H = 120;
+  const PAD = { top: 10, right: 12, bottom: 28, left: 38 };
+  const iW = W - PAD.left - PAD.right;
+  const iH = H - PAD.top - PAD.bottom;
+
+  const SOTA = 0.8684; // Retro* solve rate (dominates score)
+  const sorted = [...allSubs].sort((a, b) => a.timestamp - b.timestamp);
+  const scores = sorted.map(s => s.score);
+  const minS = 0;
+  const maxS = Math.max(SOTA * 1.05, Math.max(...scores) * 1.1, 0.1);
+
+  const t0 = sorted[0].timestamp;
+  const t1 = sorted[sorted.length - 1].timestamp || t0 + 1;
+  const xScale = n => PAD.left + ((n - t0) / (t1 - t0 || 1)) * iW;
+  const yScale = v => PAD.top + iH - ((v - minS) / (maxS - minS)) * iH;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+
+  let html = '';
+
+  // Grid lines + y-axis labels
+  const ticks = [0, 0.25, 0.5, 0.75, 1.0].filter(v => v <= maxS * 1.01);
+  ticks.forEach(v => {
+    const y = yScale(v);
+    html += `<line x1="${PAD.left}" y1="${y}" x2="${PAD.left + iW}" y2="${y}" stroke="#d9d0bc" stroke-width="1"/>`;
+    html += `<text x="${PAD.left - 4}" y="${y + 4}" text-anchor="end" font-size="9" font-family="SF Mono,Menlo,monospace" fill="#5c6b62">${(v * 100).toFixed(0)}%</text>`;
+  });
+
+  // SOTA reference line
+  const sotaY = yScale(SOTA);
+  html += `<line x1="${PAD.left}" y1="${sotaY}" x2="${PAD.left + iW}" y2="${sotaY}" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+  html += `<text x="${PAD.left + iW + 3}" y="${sotaY + 4}" font-size="9" font-family="-apple-system,sans-serif" fill="#aaa">Retro*</text>`;
+
+  // All submissions as dots
+  sorted.forEach(s => {
+    const x = allSubs.length === 1 ? PAD.left + iW / 2 : xScale(s.timestamp);
+    const y = yScale(s.score);
+    html += `<circle cx="${x}" cy="${y}" r="3.5" fill="#1f5a3d" opacity="0.5"/>`;
+  });
+
+  // Promoted frontier line
+  const promoted = sorted.filter(s => s.promoted);
+  if (promoted.length > 1) {
+    const pts = promoted.map(s => {
+      const x = allSubs.length === 1 ? PAD.left + iW / 2 : xScale(s.timestamp);
+      return `${x},${yScale(s.score)}`;
+    }).join(' ');
+    html += `<polyline points="${pts}" fill="none" stroke="#e56b52" stroke-width="2"/>`;
+  }
+  promoted.forEach(s => {
+    const x = allSubs.length === 1 ? PAD.left + iW / 2 : xScale(s.timestamp);
+    html += `<circle cx="${x}" cy="${yScale(s.score)}" r="4.5" fill="#e56b52"/>`;
+  });
+
+  // X-axis date labels
+  if (sorted.length > 1) {
+    [sorted[0], sorted[sorted.length - 1]].forEach((s, i) => {
+      const x = i === 0 ? PAD.left : PAD.left + iW;
+      const d = new Date(s.timestamp * 1000);
+      const label = d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+      html += `<text x="${x}" y="${H - 4}" text-anchor="${i === 0 ? 'start' : 'end'}" font-size="9" font-family="-apple-system,sans-serif" fill="#5c6b62">${label}</text>`;
+    });
+  }
+
+  svg.innerHTML = html;
+}
+
 async function loadLeaderboard() {
   try {
     const r = await fetch(`${JUDGE}/leaderboard`);
@@ -386,20 +499,15 @@ async function loadLeaderboard() {
       document.getElementById('best-solve').textContent = '—';
     }
 
-    // Fetch all submissions count
-    try {
-      const r2 = await fetch(`${JUDGE}/submissions?all=true`, {headers: {'Authorization': 'Bearer __public__'}});
-      if (r2.ok) {
-        const d2 = await r2.json();
-        document.getElementById('n-submissions').textContent = (d2.submissions || []).length;
-      }
-    } catch(_) {}
-
+    const history = data.history || [];
+    document.getElementById('n-submissions').textContent = history.length || '—';
     document.getElementById('n-promoted').textContent = board.length;
+
+    drawChart(history);
 
     if (board.length === 0) {
       document.getElementById('board-empty').style.display = 'block';
-      return;
+      return;  // chart drawn above before this check
     }
 
     document.getElementById('board').style.display = 'table';
