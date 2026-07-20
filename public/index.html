@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RetroFail — Retrosynthesis Route Planning Benchmark</title>
+<title>RetroFail — USPTO-190 Retrosynthesis Benchmark</title>
 <style>
   :root {
     --bg: #fdf9f0;
@@ -220,7 +220,7 @@
 <main>
 
 <p style="margin-top:1.5rem">
-  Given a target small molecule as canonical SMILES, produce a synthetic route from commercially available building blocks. Scope: <strong>PROTAC linkers</strong> and <strong>macrocycles</strong> — chemotypes where current tools visibly underperform.
+  Given a target small molecule as canonical SMILES, produce a synthetic route from commercially available building blocks. Targets: the <strong>USPTO-190</strong> set (Chen et al., <a href="https://arxiv.org/abs/2006.15820" target="_blank">Retro*, ICML 2020</a>) — 190 hard multi-step molecules, the standard benchmark in retrosynthesis planning.
 </p>
 
 <h2 id="how">Scoring</h2>
@@ -267,9 +267,43 @@
   No promoted submissions yet. Be the first.
 </p>
 
-<h2 id="targets">Public targets <span style="font-weight:400;font-size:0.85rem;color:var(--muted)">(10 of 110)</span></h2>
+<h2>Published SOTA</h2>
+<p style="font-family:-apple-system,sans-serif;font-size:0.85rem;color:var(--muted);margin-bottom:0.5rem">
+  Reference solve rates on USPTO-190. Beat these with your solver.
+</p>
+<table class="board">
+  <thead><tr><th>#</th><th>Score (solve rate)</th><th>Method</th><th>Citation</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="rank">1</td>
+      <td class="score-val">99.47%</td>
+      <td>RetroGraph</td>
+      <td style="font-size:0.8rem;color:var(--muted)">Shi et al., 2020</td>
+    </tr>
+    <tr>
+      <td class="rank">2</td>
+      <td class="score-val">98.95%</td>
+      <td>PDVN + Retro*</td>
+      <td style="font-size:0.8rem;color:var(--muted)">Liu et al., arXiv:2301.13755</td>
+    </tr>
+    <tr>
+      <td class="rank">3</td>
+      <td class="score-val">86.84%</td>
+      <td>Retro* (original)</td>
+      <td style="font-size:0.8rem;color:var(--muted)">Chen et al., ICML 2020</td>
+    </tr>
+    <tr>
+      <td class="rank">4</td>
+      <td class="score-val">62.63%</td>
+      <td>MCTS</td>
+      <td style="font-size:0.8rem;color:var(--muted)">Chen et al., ICML 2020</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="targets">Public targets <span style="font-weight:400;font-size:0.85rem;color:var(--muted)">(19 of 190)</span></h2>
 <p style="font-family:-apple-system,sans-serif;font-size:0.85rem;color:var(--muted)">
-  The hidden set (100 targets) is held server-side. Hidden set SHA-256 prefix: <code id="hidden-hash">—</code>
+  The full set (190 targets) is scored server-side. Target set SHA-256 prefix: <code id="hidden-hash">—</code>
 </p>
 <table class="targets" id="targets-table">
   <thead><tr><th>ID</th><th>SMILES</th><th>Chemotype</th></tr></thead>
@@ -330,7 +364,7 @@ async function loadLeaderboard() {
       const pct = (m.solve_rate || 0) * 100;
       document.getElementById('progress-fill').style.width = pct + '%';
       document.getElementById('progress-label-right').textContent =
-        `${m.solved || 0} / ${m.total || 100}`;
+        `${m.solved || 0} / ${m.total || 190}`;
       document.getElementById('progress-wrap').style.display = 'block';
     } else {
       document.getElementById('best-score').textContent = '—';

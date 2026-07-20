@@ -15,8 +15,7 @@ RUN pip install --no-cache-dir \
     rdkit \
     pandas
 
-# Generate hidden targets at build time (baked in, not in git)
-RUN python3 targets/generate.py --seed 42 --public 10 --hidden 100 --out-dir targets/
+# Targets are committed to git (public.csv + hidden.csv from USPTO-190)
 
 # Data dir (overridden by fly volume mount at /data)
 ENV RETROFAIL_DATA=/data
