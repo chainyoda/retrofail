@@ -277,17 +277,22 @@
 </table>
 
 <h2>Participate</h2>
-<pre><code># 1. Register and get an API key at /auth/register?name=yourname
-# 2. Clone the benchmark
-python3 cli/retrofail.py login &lt;api-key&gt;
-python3 cli/retrofail.py clone challenge
-cd challenge
+<pre><code># 1. Get an API key
+curl https://retrofail-judge-production.up.railway.app/auth/register?name=yourname
 
-# 3. Edit solver/solve.py — implement solve(target_smiles) -> Route
-# 4. Test locally
-python3 cli/retrofail.py run
+# 2. Clone the repo
+git clone https://github.com/chainyoda/retrofail
+cd retrofail
 
-# 5. Submit
+# 3. Install deps
+./setup.sh
+
+# 4. Edit solver/solve.py — implement solve(target_smiles) -> Route
+# 5. Test locally
+bash benchmark.sh
+
+# 6. Submit
+python3 cli/retrofail.py login &lt;api-key&gt; --api https://retrofail-judge-production.up.railway.app
 python3 cli/retrofail.py submit --note "approach description"</code></pre>
 
 <h2>Verifier</h2>
@@ -304,13 +309,12 @@ python3 cli/retrofail.py submit --note "approach description"</code></pre>
 </main>
 
 <script>
-// On Vercel: /api/* routes to serverless functions.
-// Locally with uvicorn: same host, no prefix needed.
 const API = '';
+const JUDGE = 'https://retrofail-judge-production.up.railway.app';
 
 async function loadLeaderboard() {
   try {
-    const r = await fetch(`${API}/api/leaderboard`);
+    const r = await fetch(`${JUDGE}/leaderboard`);
     const data = await r.json();
     const board = data.leaderboard || [];
     const allSubs = data.all_count || board.length;
@@ -335,7 +339,7 @@ async function loadLeaderboard() {
 
     // Fetch all submissions count
     try {
-      const r2 = await fetch(`${API}/api/submissions?all=true`, {headers: {'Authorization': 'Bearer __public__'}});
+      const r2 = await fetch(`${JUDGE}/submissions?all=true`, {headers: {'Authorization': 'Bearer __public__'}});
       if (r2.ok) {
         const d2 = await r2.json();
         document.getElementById('n-submissions').textContent = (d2.submissions || []).length;

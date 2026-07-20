@@ -247,7 +247,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://retrofail.vercel.app", "http://localhost:8000", "http://localhost:3000"],
+    allow_origins=["https://retrofail.vercel.app", "http://localhost:8000", "http://localhost:3000", "https://retrofail-judge-production.up.railway.app"],
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
 )

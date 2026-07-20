@@ -48,14 +48,8 @@ class handler(BaseHTTPRequestHandler):
         self._json(200, {"submissions": subs})
 
     def do_POST(self):
-        judge_url = os.environ.get("JUDGE_URL", "")
-        if judge_url:
-            self._json(307, {"redirect": judge_url + "/submit"})
-        else:
-            self._json(503, {
-                "error": "Submission judging requires a compute backend. "
-                         "Run locally: uvicorn server.main:app"
-            })
+        judge_url = os.environ.get("JUDGE_URL", "https://retrofail-judge-production.up.railway.app")
+        self._json(307, {"redirect": judge_url + "/submit"})
 
     def _json(self, code, data):
         body = json.dumps(data).encode()
