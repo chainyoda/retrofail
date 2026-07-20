@@ -254,6 +254,16 @@
   Targets are the <strong>USPTO-190</strong> set from <a href="https://arxiv.org/abs/2006.15820" target="_blank">Chen et al. (Retro*, ICML 2020)</a>, the standard 190-molecule evaluation set used across the retrosynthesis literature. Submit your solver and see where it lands against published methods.
 </p>
 
+<div class="chart-wrap" id="chart-wrap" style="display:none">
+  <div class="chart-title">Score history</div>
+  <svg class="chart-svg" id="score-chart" height="120"></svg>
+  <div class="chart-legend">
+    <span><span class="legend-dot" style="background:var(--accent)"></span>Submissions</span>
+    <span><span class="legend-dot" style="background:var(--pop)"></span>Best (promoted)</span>
+    <span><span class="legend-dot" style="background:#aaa;border-radius:0;width:18px;height:2px;vertical-align:middle"></span>Retro* SOTA 86.8%</span>
+  </div>
+</div>
+
 <h2 id="how">How it works</h2>
 <p style="font-family:-apple-system,sans-serif;font-size:0.9rem;line-height:1.7">
   Your solver receives a target molecule as a SMILES string and must return a tree of reactions tracing it back to commercially available starting materials. Each internal node is a reaction step; each leaf must appear in the building block catalog. Routes are validated by a pinned RDKit verifier — no partial credit, no manual review.
@@ -287,16 +297,6 @@
     <span id="progress-label-right">0 / 100</span>
   </div>
   <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-</div>
-
-<div class="chart-wrap" id="chart-wrap" style="display:none">
-  <div class="chart-title">Score history</div>
-  <svg class="chart-svg" id="score-chart" height="120"></svg>
-  <div class="chart-legend">
-    <span><span class="legend-dot" style="background:var(--accent)"></span>Submissions</span>
-    <span><span class="legend-dot" style="background:var(--pop)"></span>Best (promoted)</span>
-    <span><span class="legend-dot" style="background:#aaa;border-radius:0;width:18px;height:2px;vertical-align:middle"></span>Retro* SOTA 86.8%</span>
-  </div>
 </div>
 
 <h2 id="leaderboard">Leaderboard</h2>
