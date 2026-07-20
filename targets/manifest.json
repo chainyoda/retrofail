@@ -1,0 +1,11 @@
+{
+  "seed": 42,
+  "n_public": 10,
+  "n_hidden": 100,
+  "hidden_sha256": "30e5c4956f3b20c3",
+  "tanimoto_cutoff": 0.7,
+  "mw_range": [
+    200.0,
+    900.0
+  ]
+}

@@ -1,6 +1,11 @@
 id,smiles,chemotype,notes
-t001,O=C(CCCCCCCCCC(=O)Nc1ccc(NC(=O)c2ccc(F)cc2)cc1)NO,protac_linker,PEG-free alkyl linker
-t002,O=C(CCOCCOCCOCCOCCOCCOCCC(=O)Nc1ccc(NC(=O)c2ccc(Cl)cc2)cc1)NO,protac_linker,PEG linker 6-unit
-t003,O=C1NC(=O)c2cc(NC(=O)c3ccc(F)cc3)ccc21,macrocycle_small,7-membered lactam
-t004,C1CC(=O)NCC(=O)NCC(=O)NCCO1,macrocycle_small,cyclic peptoid fragment
-t005,O=C(CCCCOc1ccc(NC(=O)c2ccc(Br)cc2)cc1)NO,protac_linker,aryl ether linker
+t001,O=C(CCCCCCCCCCC(=O)Nc1ccncc1)Nc1ccncc1,protac_linker,
+t002,N#Cc1ccc(NC(=O)COCCCCC(=O)NO)cc1,protac_linker_ha,
+t003,O=C(CCCCCCCCCCCCC(=O)Nc1cccc(F)c1)NO,protac_linker_ha,
+t004,O=C(CCCCCCCCCCCC(=O)Nc1ccc(Br)cc1)Nc1ccc(Br)cc1,protac_linker,
+t005,O=C(COCCOCCOCCOCCOCCOCCOC(=O)NO)Nc1ccc(Br)cc1,protac_linker_ha,
+t006,O=C(CCCCCCCCCCCC(=O)Nc1ccc2ccccc2c1)NO,protac_linker_ha,
+t007,Cc1ccc(NC(=O)CCCCCC(=O)Nc2ccc(C)cc2)cc1,protac_linker,
+t008,O=C1CN(Cc2ccccc2)CC(=O)N(Cc2ccccc2)CC(=O)N1,macrocycle,
+t009,O=C(CCCCCC(=O)Nc1ccc(Br)cc1)NO,protac_linker_ha,
+t010,N#Cc1ccc(NC(=O)COCCCOCCOC(=O)NO)cc1,protac_linker_ha,
