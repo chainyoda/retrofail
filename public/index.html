@@ -226,12 +226,24 @@
   Targets are the <strong>USPTO-190</strong> set from <a href="https://arxiv.org/abs/2006.15820" target="_blank">Chen et al. (Retro*, ICML 2020)</a>, the standard 190-molecule evaluation set used across the retrosynthesis literature. Submit your solver and see where it lands against published methods.
 </p>
 
-<h2 id="how">Scoring</h2>
+<h2 id="how">How it works</h2>
+<p style="font-family:-apple-system,sans-serif;font-size:0.9rem;line-height:1.7">
+  Your solver receives a target molecule as a SMILES string and must return a tree of reactions tracing it back to commercially available starting materials. Each internal node is a reaction step; each leaf must appear in the building block catalog. Routes are validated by a pinned RDKit verifier — no partial credit, no manual review.
+</p>
+<p style="font-family:-apple-system,sans-serif;font-size:0.9rem;line-height:1.7">
+  Submissions are scored against all 190 targets on the server. A submission only appears on the leaderboard if it strictly beats the current best score.
+</p>
+
+<h2>Scoring</h2>
 <div class="formula">score = solve_rate<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ 0.10 &times; mean_route_efficiency<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&minus; 0.01 &times; mean_wall_clock_seconds</div>
 
-<p>Higher is better. <code>solve_rate</code> is the fraction of hidden targets with a valid route. A submission is only promoted if it strictly improves on the current best.</p>
+<p style="font-family:-apple-system,sans-serif;font-size:0.85rem;color:var(--muted);margin-top:0.6rem">
+  <code>solve_rate</code>: fraction of 190 targets with a valid route (dominates the score).
+  <code>route_efficiency</code>: 1 / depth per solved target, rewarding shorter routes.
+  <code>wall_clock</code>: mean seconds per target, penalizing slow solvers. 60s hard limit per target.
+</p>
 
 <h2>Current frontier</h2>
 <div id="stats-loading" class="stats">
