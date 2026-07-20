@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "name": "retrofail",
+  "description": "Retrosynthesis route planning for hard chemotypes (PROTAC linkers, macrocycles).",
+  "category": "python",
+  "direction": "+",
+  "editablePaths": ["solver"],
+  "setupCommand": ["bash", "-lc", "./setup.sh"],
+  "benchmarkCommand": ["bash", "-lc", "./benchmark.sh"],
+  "scorePath": "score.json"
+}
