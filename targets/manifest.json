@@ -1,13 +1,14 @@
 {
-  "source": "USPTO-190 (Chen et al., Retro*, ICML 2020)",
-  "citation": "https://arxiv.org/abs/2006.15820",
-  "total": 190,
+  "name": "Natural Products Total Synthesis Benchmark",
+  "description": "19 canonical natural products from the history of total synthesis, ordered from tractable to legendary.",
+  "total": 19,
   "public": 19,
-  "hidden": 190,
-  "hidden_sha256": "3c1e3b0f179be961",
-  "sota": {
-    "retro_star": 0.8684,
-    "retro_graph": 0.9947,
-    "pdvn_retro_star": 0.9895
-  }
+  "hidden": 19,
+  "hidden_sha256": "cab603422f71b630",
+  "human_baselines": {
+    "shortest_known": "cocaine (Willst\u00e4tter 1898, 2 steps)",
+    "longest_known": "taxol (Holton 1994, 51 steps)"
+  },
+  "ai_baseline": null,
+  "note": "No AI system has published solve rates against this set. First to report establishes the baseline."
 }

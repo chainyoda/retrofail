@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1f5a3d">
-<title>RetroFail — can you beat Retro*?</title>
-<meta name="description" content="A benchmark arena for multi-step retrosynthesis. Run your solver against USPTO-190, verify against the benchmark, and submit your score.">
+<title>RetroFail — can your AI synthesize taxol?</title>
+<meta name="description" content="A benchmark arena for natural product total synthesis. 19 canonical targets from cocaine to taxol. Woodward spent decades. How far does your solver get?">
 <style>
   :root {
     --primary: #1f5a3d;
@@ -544,7 +544,7 @@
     <a class="site-name" href="#">Retro<span>Fail</span></a>
     <nav class="nav-links">
       <a class="nav-btn" href="#how">How it works</a>
-      <a class="nav-btn" href="#sota">Will you beat Retro*?</a>
+      <a class="nav-btn" href="#sota">The targets</a>
       <a class="nav-btn" href="#participate">Participate</a>
       <a class="nav-btn" href="https://github.com/chainyoda/retrofail" target="_blank">GitHub</a>
     </nav>
@@ -610,11 +610,11 @@
 
       <div class="hero-content">
         <div class="hero-headline" id="hero-headline">
-          Can you beat <span class="beat">Retro*</span>?
+          Can your AI synthesize <span class="beat">taxol</span>?
         </div>
         <div class="hero-actions">
           <a class="hero-btn" href="#how">How it works</a>
-          <a class="hero-btn" href="#sota">Will you beat Retro*?</a>
+          <a class="hero-btn" href="#sota">The targets</a>
           <a class="hero-btn" href="#participate">Participate</a>
         </div>
 
@@ -625,7 +625,7 @@
           </div>
           <div class="frontier-labels">
             <span id="frontier-left">Best solve rate: <span class="frontier-val" id="frontier-pct">—</span></span>
-            <span>Retro* SOTA: <span class="frontier-val">86.8%</span></span>
+            <span>19 targets · 0 solved by AI so far</span>
           </div>
         </div>
 
@@ -697,7 +697,7 @@
         <div class="steps">
           <div class="step">
             <div class="step-num">1</div>
-            <div class="step-body"><strong>Get a target.</strong> Your solver receives a molecule as a SMILES string from the USPTO-190 set — 190 hard multi-step druglike molecules from <a href="https://arxiv.org/abs/2006.15820" target="_blank" style="color:var(--primary)">Chen et al. (Retro*, ICML 2020)</a>.</div>
+            <div class="step-body"><strong>Get a target.</strong> Your solver receives a canonical natural product as a SMILES string — cocaine, strychnine, taxol, and 16 others. These took the best synthetic chemists in history between 2 and 51 steps to make by hand.</div>
           </div>
           <div class="step">
             <div class="step-num">2</div>
@@ -725,10 +725,10 @@
         </div>
       </div>
 
-      <!-- Will you beat Retro* -->
+      <!-- Will you beat the chemists -->
       <div class="card" id="sota">
-        <div class="card-title">Will you beat Retro*?</div>
-        <p style="font-size:0.875rem;color:var(--muted);margin-bottom:1rem">Published solve rates on USPTO-190. These are the numbers to beat.</p>
+        <div class="card-title">The targets</div>
+        <p style="font-size:0.875rem;color:var(--muted);margin-bottom:1rem">19 canonical natural products from the history of total synthesis, ordered by human step count. No AI system has published solve rates against this set — first to report establishes the baseline.</p>
         <div>
           <div class="sota-row sota-you" id="sota-you" style="display:none">
             <span class="sota-rank">★</span>
@@ -737,28 +737,52 @@
             <span class="sota-cite"></span>
           </div>
           <div class="sota-row">
-            <span class="sota-rank">1</span>
-            <span class="sota-score">99.47%</span>
-            <span class="sota-name">RetroGraph</span>
-            <span class="sota-cite">Shi et al., 2020</span>
+            <span class="sota-rank" style="width:2rem">easy</span>
+            <span class="sota-score">2 steps</span>
+            <span class="sota-name">Cocaine</span>
+            <span class="sota-cite">Willstätter, 1898</span>
           </div>
           <div class="sota-row">
-            <span class="sota-rank">2</span>
-            <span class="sota-score">98.95%</span>
-            <span class="sota-name">PDVN + Retro*</span>
-            <span class="sota-cite">Liu et al., arXiv:2301.13755</span>
+            <span class="sota-rank" style="width:2rem"></span>
+            <span class="sota-score">9 steps</span>
+            <span class="sota-name">Penicillin G</span>
+            <span class="sota-cite">Sheehan, 1957</span>
           </div>
           <div class="sota-row">
-            <span class="sota-rank">3</span>
-            <span class="sota-score">86.84%</span>
-            <span class="sota-name">Retro* (original)</span>
-            <span class="sota-cite">Chen et al., ICML 2020</span>
+            <span class="sota-rank" style="width:2rem"></span>
+            <span class="sota-score">17 steps</span>
+            <span class="sota-name">Quinine</span>
+            <span class="sota-cite">Woodward &amp; Doering, 1944</span>
           </div>
           <div class="sota-row">
-            <span class="sota-rank">4</span>
-            <span class="sota-score">62.63%</span>
-            <span class="sota-name">MCTS</span>
-            <span class="sota-cite">Chen et al., ICML 2020</span>
+            <span class="sota-rank" style="width:2rem"></span>
+            <span class="sota-score">21 steps</span>
+            <span class="sota-name">Colchicine</span>
+            <span class="sota-cite">Woodward, 1963</span>
+          </div>
+          <div class="sota-row">
+            <span class="sota-rank" style="width:2rem"></span>
+            <span class="sota-score">24 steps</span>
+            <span class="sota-name">Reserpine</span>
+            <span class="sota-cite">Woodward, 1956</span>
+          </div>
+          <div class="sota-row">
+            <span class="sota-rank" style="width:2rem"></span>
+            <span class="sota-score">29 steps</span>
+            <span class="sota-name">Strychnine</span>
+            <span class="sota-cite">Woodward, 1954</span>
+          </div>
+          <div class="sota-row">
+            <span class="sota-rank" style="width:2rem"></span>
+            <span class="sota-score">30 steps</span>
+            <span class="sota-name">Morphine</span>
+            <span class="sota-cite">Gates &amp; Tschudi, 1952</span>
+          </div>
+          <div class="sota-row">
+            <span class="sota-rank" style="width:2rem">hard</span>
+            <span class="sota-score">51 steps</span>
+            <span class="sota-name">Taxol</span>
+            <span class="sota-cite">Holton, 1994</span>
           </div>
         </div>
       </div>
@@ -842,7 +866,7 @@
         <div class="card-title">Public targets <span style="font-weight:400;color:var(--muted)">(19 of 190) &nbsp;·&nbsp; SHA-256 prefix: <code id="hidden-hash">—</code></span></div>
         <div style="overflow-x:auto">
           <table class="targets" id="targets-table">
-            <thead><tr><th>ID</th><th>SMILES</th></tr></thead>
+            <thead><tr><th>Target</th><th>First synthesis</th><th>SMILES</th></tr></thead>
             <tbody id="targets-body"></tbody>
           </table>
         </div>
@@ -991,7 +1015,7 @@ function drawChart(history) {
   const PAD = { top: 12, right: 48, bottom: 28, left: 40 };
   const iW = W - PAD.left - PAD.right;
   const iH = H - PAD.top - PAD.bottom;
-  const SOTA = 0.8684;
+  const SOTA = 1.0; // theoretical maximum: solve all 19
   const sorted = [...history].sort((a, b) => a.timestamp - b.timestamp);
   const scores = sorted.map(s => s.score);
   const maxS = Math.max(SOTA * 1.08, Math.max(...scores) * 1.12, 0.1);
@@ -1011,7 +1035,7 @@ function drawChart(history) {
   // SOTA line
   const sy = yS(SOTA);
   h += `<line x1="${PAD.left}" y1="${sy}" x2="${PAD.left+iW}" y2="${sy}" stroke="rgba(238,245,241,0.4)" stroke-width="1.5" stroke-dasharray="5 3"/>`;
-  h += `<text x="${PAD.left+iW+4}" y="${sy+4}" font-size="9" font-family="-apple-system,sans-serif" fill="rgba(238,245,241,0.45)">Retro*</text>`;
+  h += `<text x="${PAD.left+iW+4}" y="${sy+4}" font-size="9" font-family="-apple-system,sans-serif" fill="rgba(238,245,241,0.45)">100%</text>`;
   // Dots
   sorted.forEach(s => {
     const x = sorted.length === 1 ? PAD.left + iW/2 : xS(s.timestamp);
@@ -1059,10 +1083,12 @@ async function loadLeaderboard() {
       const sr = (m.solve_rate || 0) * 100;
       document.getElementById('best-score').textContent = best.score.toFixed(4);
       document.getElementById('best-solve').textContent = sr.toFixed(0) + '%';
-      document.getElementById('frontier-fill').style.width = Math.min(sr / 86.84 * 100, 100) + '%';
+      document.getElementById('frontier-fill').style.width = Math.min(sr, 100) + '%';
       document.getElementById('frontier-pct').textContent = sr.toFixed(1) + '%';
+      const solved = m.solved || 0;
+      const total = m.total || 19;
       document.getElementById('hero-headline').innerHTML =
-        `<span id="hero-pct">${sr.toFixed(0)}%</span> of <span class="beat">Retro*</span>'s solve rate`;
+        `<span id="hero-pct">${solved}/${total}</span> natural products <span class="beat">synthesized</span>`;
 
       // Show in SOTA table
       const row = document.getElementById('sota-you');
@@ -1106,7 +1132,8 @@ async function loadTargets() {
     const tbody = document.getElementById('targets-body');
     (data.targets || []).forEach(t => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td><strong>${t.id}</strong></td><td>${t.smiles}</td>`;
+      const name = t.id.replace(/_/g, ' ');
+      tr.innerHTML = `<td><strong>${name}</strong></td><td style="color:var(--muted);font-size:0.72rem">${t.human_synthesis||''}</td><td>${t.smiles}</td>`;
       tbody.appendChild(tr);
     });
     const mfr = data.manifest || {};
