@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "retrofail"
+version = "0.1.0"
+description = "CLI for the RetroFail retrosynthesis benchmark"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.urls]
+Homepage = "https://retrofail.vercel.app"
+Repository = "https://github.com/chainyoda/retrofail"
+
+[project.scripts]
+retrofail = "retrofail.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["retrofail*"]

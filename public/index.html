@@ -444,6 +444,91 @@
   #board-error { color: #c0392b; font-size: 0.85rem; display: none; }
   #board-empty { color: var(--muted); font-size: 0.85rem; font-style: italic; display: none; }
 
+  /* Auth button + modal */
+  .auth-btn {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.9rem;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--fg);
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+    white-space: nowrap;
+  }
+  .auth-btn:hover { background: var(--well); border-color: var(--muted); }
+  .auth-btn.signed-in { background: var(--primary); color: var(--primary-fg); border-color: var(--primary); }
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(26,36,32,0.55);
+    backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem;
+    width: min(420px, calc(100vw - 2rem));
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    position: relative;
+  }
+  .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .modal-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.25rem; }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 1.1rem; line-height: 1;
+    padding: 0.25rem; border-radius: 4px;
+  }
+  .modal-close:hover { background: var(--well); color: var(--fg); }
+  .modal label { font-size: 0.8rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.06em; font-family: var(--mono); }
+  .modal input[type=text] {
+    width: 100%; padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border); border-radius: 7px;
+    font-size: 0.9rem; font-family: var(--sans);
+    background: var(--bg); color: var(--fg);
+    outline: none; transition: border-color 0.12s;
+    margin-bottom: 0.75rem;
+  }
+  .modal input[type=text]:focus { border-color: var(--primary); }
+  .modal-submit {
+    width: 100%; padding: 0.6rem;
+    background: var(--primary); color: var(--primary-fg);
+    border: none; border-radius: 7px;
+    font-size: 0.875rem; font-weight: 600;
+    cursor: pointer; transition: opacity 0.12s;
+  }
+  .modal-submit:hover { opacity: 0.88; }
+  .modal-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .key-box {
+    background: var(--well);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.65rem 0.85rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    word-break: break-all;
+    color: var(--primary);
+    font-weight: 600;
+    margin: 0.75rem 0;
+    cursor: pointer;
+    position: relative;
+  }
+  .key-box::after {
+    content: 'click to copy';
+    position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%);
+    font-size: 0.65rem; color: var(--muted); font-weight: 400;
+  }
+  .key-box.copied::after { content: 'copied!'; color: var(--primary); }
+  .modal-error { color: #c0392b; font-size: 0.8rem; margin-top: 0.5rem; }
+  .modal-divider { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+  .signed-in-name { font-size: 0.8rem; color: var(--muted); }
+  .signed-in-name strong { color: var(--fg); }
+
   @media (max-width: 640px) {
     .hero { padding: 1.25rem; }
     .hero-headline { font-size: 1.25rem; }
@@ -463,8 +548,48 @@
       <a class="nav-btn" href="#participate">Participate</a>
       <a class="nav-btn" href="https://github.com/chainyoda/retrofail" target="_blank">GitHub</a>
     </nav>
+    <button class="auth-btn" id="auth-btn" onclick="openAuth()">Get API key</button>
   </div>
 </header>
+
+<!-- Auth modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeAuth()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <div id="modal-register">
+      <div class="modal-title">Get your API key</div>
+      <div class="modal-sub">Choose a username to register. Your API key is shown once.</div>
+      <label for="reg-name">Username</label>
+      <input type="text" id="reg-name" placeholder="yourname" maxlength="32" autocomplete="off">
+      <button class="modal-submit" id="reg-btn" onclick="register()">Register</button>
+      <div class="modal-error" id="reg-error"></div>
+      <hr class="modal-divider">
+      <div style="font-size:0.8rem;color:var(--muted)">Already have a key? <button onclick="showKeyEntry()" style="background:none;border:none;color:var(--primary);font-weight:600;cursor:pointer;font-size:0.8rem;padding:0">Enter it</button></div>
+    </div>
+    <div id="modal-key-entry" style="display:none">
+      <div class="modal-title">Enter API key</div>
+      <div class="modal-sub">Paste your existing API key to sign in.</div>
+      <label for="existing-key">API key</label>
+      <input type="text" id="existing-key" placeholder="rf_..." autocomplete="off">
+      <button class="modal-submit" onclick="signInWithKey()">Sign in</button>
+      <div class="modal-error" id="key-error"></div>
+      <hr class="modal-divider">
+      <div style="font-size:0.8rem;color:var(--muted)">No key yet? <button onclick="showRegister()" style="background:none;border:none;color:var(--primary);font-weight:600;cursor:pointer;font-size:0.8rem;padding:0">Register</button></div>
+    </div>
+    <div id="modal-key-reveal" style="display:none">
+      <div class="modal-title">Your API key</div>
+      <div class="modal-sub">Save this somewhere safe — it won't be shown again.</div>
+      <div class="key-box" id="key-display" onclick="copyKey()"></div>
+      <button class="modal-submit" onclick="closeAuth()">Done</button>
+    </div>
+    <div id="modal-signed-in" style="display:none">
+      <div class="modal-title">API key</div>
+      <div class="modal-sub" id="signed-in-user"></div>
+      <div class="key-box" id="key-display-2" onclick="copyKey2()"></div>
+      <button class="modal-submit" onclick="signOut()" style="background:var(--well);color:var(--fg);margin-top:0.5rem">Sign out</button>
+    </div>
+  </div>
+</div>
 
 <div class="page">
 
@@ -648,9 +773,8 @@
             <span class="step-idx">1</span>
             <div class="step-content">
               <div class="step-title">Get an API key</div>
-              <div class="step-desc">Register a username to receive your API key. Keys are shown once — save it.</div>
+              <div class="step-desc">Register a username to receive your key. <button onclick="openAuth()" style="background:none;border:none;color:var(--primary);font-weight:600;cursor:pointer;font-size:inherit;padding:0;text-decoration:underline;text-underline-offset:2px">Register in one click</button> or via the terminal:</div>
               <div class="terminal">
-                <span class="comment"># replace "yourname" with your username</span><br>
                 <span class="prompt">$ </span><span class="cmd">curl "https://retrofail-judge-production.up.railway.app/auth/register?name=yourname"</span>
               </div>
             </div>
@@ -659,11 +783,11 @@
           <div class="terminal-step">
             <span class="step-idx">2</span>
             <div class="step-content">
-              <div class="step-title">Clone and install</div>
-              <div class="step-desc">Clone the benchmark repo and install dependencies (Python 3.10+, RDKit).</div>
+              <div class="step-title">Install the CLI</div>
+              <div class="step-desc">Requires Python 3.10+. RDKit is needed for local scoring.</div>
               <div class="terminal">
-                <span class="prompt">$ </span><span class="cmd">git clone https://github.com/chainyoda/retrofail</span><br>
-                <span class="prompt">$ </span><span class="cmd">cd retrofail && ./setup.sh</span>
+                <span class="prompt">$ </span><span class="cmd">pip install retrofail</span><br>
+                <span class="prompt">$ </span><span class="cmd">retrofail login &lt;api-key&gt; --api https://retrofail-judge-production.up.railway.app</span>
               </div>
             </div>
           </div>
@@ -671,13 +795,25 @@
           <div class="terminal-step">
             <span class="step-idx">3</span>
             <div class="step-content">
+              <div class="step-title">Clone the benchmark</div>
+              <div class="step-desc">The repo contains the solver scaffold, verifier, and public targets.</div>
+              <div class="terminal">
+                <span class="prompt">$ </span><span class="cmd">git clone https://github.com/chainyoda/retrofail</span><br>
+                <span class="prompt">$ </span><span class="cmd">cd retrofail && pip install rdkit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="terminal-step">
+            <span class="step-idx">4</span>
+            <div class="step-content">
               <div class="step-title">Improve the solver</div>
               <div class="step-desc">Edit <code>solver/solve.py</code> and implement <code>solve(target_smiles: str) -&gt; dict | None</code>. Return a route tree or <code>None</code> if unsolvable.</div>
             </div>
           </div>
 
           <div class="terminal-step">
-            <span class="step-idx">4</span>
+            <span class="step-idx">5</span>
             <div class="step-content">
               <div class="step-title">Test locally</div>
               <div class="step-desc">Run against the 19 public targets. Check <code>score.json</code> for your local score.</div>
@@ -688,14 +824,12 @@
           </div>
 
           <div class="terminal-step">
-            <span class="step-idx">5</span>
+            <span class="step-idx">6</span>
             <div class="step-content">
               <div class="step-title">Submit</div>
-              <div class="step-desc">Log in with your API key and submit. Your solver runs against all 190 hidden targets on the server. Only promoted if it strictly beats the current best.</div>
+              <div class="step-desc">Your solver runs against all 190 hidden targets on the server. Only promoted if it strictly beats the current best score.</div>
               <div class="terminal">
-                <span class="prompt">$ </span><span class="cmd">python3 cli/retrofail.py login &lt;api-key&gt; \</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">--api https://retrofail-judge-production.up.railway.app</span><br>
-                <span class="prompt">$ </span><span class="cmd">python3 cli/retrofail.py submit --note "describe your approach"</span>
+                <span class="prompt">$ </span><span class="cmd">retrofail submit --note "describe your approach"</span>
               </div>
             </div>
           </div>
@@ -732,6 +866,121 @@
 
 <script>
 const JUDGE = 'https://retrofail-judge-production.up.railway.app';
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+function getSession() {
+  try { return JSON.parse(localStorage.getItem('retrofail_session') || 'null'); } catch { return null; }
+}
+function setSession(s) { localStorage.setItem('retrofail_session', JSON.stringify(s)); }
+function clearSession() { localStorage.removeItem('retrofail_session'); }
+
+function openAuth() {
+  const s = getSession();
+  document.getElementById('modal-register').style.display = 'block';
+  document.getElementById('modal-key-entry').style.display = 'none';
+  document.getElementById('modal-key-reveal').style.display = 'none';
+  document.getElementById('modal-signed-in').style.display = 'none';
+  if (s) {
+    document.getElementById('modal-register').style.display = 'none';
+    document.getElementById('modal-signed-in').style.display = 'block';
+    document.getElementById('signed-in-user').textContent = `Signed in as ${s.name}`;
+    document.getElementById('key-display-2').textContent = s.key;
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeAuth() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+function showKeyEntry() {
+  document.getElementById('modal-register').style.display = 'none';
+  document.getElementById('modal-key-entry').style.display = 'block';
+}
+function showRegister() {
+  document.getElementById('modal-key-entry').style.display = 'none';
+  document.getElementById('modal-register').style.display = 'block';
+}
+
+async function register() {
+  const name = document.getElementById('reg-name').value.trim();
+  const err = document.getElementById('reg-error');
+  err.textContent = '';
+  if (!name || !/^[a-zA-Z0-9_-]{2,32}$/.test(name)) {
+    err.textContent = 'Username must be 2-32 chars, letters/numbers/_ only.';
+    return;
+  }
+  const btn = document.getElementById('reg-btn');
+  btn.disabled = true; btn.textContent = 'Registering...';
+  try {
+    const r = await fetch(`${JUDGE}/auth/register?name=${encodeURIComponent(name)}`);
+    const d = await r.json();
+    if (!r.ok) { err.textContent = d.detail || 'Registration failed.'; return; }
+    setSession({ name: d.name, key: d.api_key });
+    updateAuthBtn();
+    document.getElementById('modal-register').style.display = 'none';
+    document.getElementById('modal-key-reveal').style.display = 'block';
+    document.getElementById('key-display').textContent = d.api_key;
+  } catch(e) {
+    err.textContent = 'Could not reach server.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Register';
+  }
+}
+
+async function signInWithKey() {
+  const key = document.getElementById('existing-key').value.trim();
+  const err = document.getElementById('key-error');
+  err.textContent = '';
+  if (!key) { err.textContent = 'Paste your API key.'; return; }
+  try {
+    const r = await fetch(`${JUDGE}/auth/login`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({api_key: key})
+    });
+    const d = await r.json();
+    if (!r.ok) { err.textContent = 'Invalid key.'; return; }
+    setSession({ name: d.user, key });
+    updateAuthBtn();
+    closeAuth();
+  } catch { err.textContent = 'Could not reach server.'; }
+}
+
+function signOut() {
+  clearSession();
+  updateAuthBtn();
+  closeAuth();
+}
+
+function copyKey() {
+  const k = document.getElementById('key-display').textContent;
+  navigator.clipboard.writeText(k).then(() => {
+    document.getElementById('key-display').classList.add('copied');
+    setTimeout(() => document.getElementById('key-display').classList.remove('copied'), 1500);
+  });
+}
+function copyKey2() {
+  const k = document.getElementById('key-display-2').textContent;
+  navigator.clipboard.writeText(k).then(() => {
+    document.getElementById('key-display-2').classList.add('copied');
+    setTimeout(() => document.getElementById('key-display-2').classList.remove('copied'), 1500);
+  });
+}
+
+function updateAuthBtn() {
+  const s = getSession();
+  const btn = document.getElementById('auth-btn');
+  if (s) {
+    btn.textContent = s.name;
+    btn.classList.add('signed-in');
+  } else {
+    btn.textContent = 'Get API key';
+    btn.classList.remove('signed-in');
+  }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAuth(); });
+document.getElementById('reg-name').addEventListener('keydown', e => { if (e.key === 'Enter') register(); });
+updateAuthBtn();
 
 function drawChart(history) {
   if (!history || history.length === 0) return;
