@@ -3,475 +3,705 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RetroFail — USPTO-190 Retrosynthesis Benchmark</title>
+<meta name="theme-color" content="#1f5a3d">
+<title>RetroFail — can you beat Retro*?</title>
+<meta name="description" content="A benchmark arena for multi-step retrosynthesis. Run your solver against USPTO-190, verify against the benchmark, and submit your score.">
 <style>
   :root {
-    --bg: #fdf9f0;
-    --fg: #1f2a24;
-    --muted: #5c6b62;
-    --accent: #1f5a3d;
-    --pop: #e56b52;
-    --rule: #d9d0bc;
-    --code-bg: #f2ecda;
+    --primary: #1f5a3d;
+    --primary-fg: #eef5f1;
+    --accent: #4caf7d;
+    --bg: #f7f6f1;
+    --fg: #1a2420;
+    --muted: #627069;
+    --border: #dbd5c8;
+    --card: #ffffff;
+    --well: #f1ede4;
+    --mono: "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --serif: Georgia, "Times New Roman", serif;
   }
-  * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
   body {
-    margin: 0;
-    padding: 0;
-    font-family: Georgia, "Times New Roman", serif;
-    line-height: 1.65;
+    font-family: var(--sans);
     background: var(--bg);
     color: var(--fg);
-  }
-  header {
-    border-bottom: 2px solid var(--rule);
-    padding: 1.5rem 2rem;
-    display: flex;
-    align-items: baseline;
-    gap: 1.5rem;
-  }
-  header h1 {
-    margin: 0;
-    font-size: 1.6rem;
-    color: var(--accent);
-    letter-spacing: -0.01em;
-  }
-  header nav a {
-    color: var(--muted);
-    text-decoration: none;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: 0.85rem;
-  }
-  header nav a:hover { color: var(--pop); }
-  main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 6rem; }
-  h2 {
-    font-size: 1.1rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 600;
-    margin: 2.5rem 0 0.8rem;
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 0.3rem;
-  }
-  p { margin: 0.7rem 0; }
-  code {
-    font-family: "SF Mono", Menlo, Consolas, monospace;
-    background: var(--code-bg);
-    padding: 0.1em 0.35em;
-    border-radius: 3px;
-    font-size: 0.88em;
-  }
-  pre {
-    background: var(--code-bg);
-    padding: 1rem 1.2rem;
-    border-radius: 4px;
-    overflow-x: auto;
-    border-left: 3px solid var(--pop);
-    font-size: 0.88rem;
-    line-height: 1.5;
-  }
-  pre code { background: transparent; padding: 0; }
-  a { color: var(--pop); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
-
-  /* Score formula */
-  .formula {
-    background: var(--code-bg);
-    border-left: 3px solid var(--accent);
-    padding: 1rem 1.2rem;
-    border-radius: 4px;
-    font-family: "SF Mono", Menlo, Consolas, monospace;
-    font-size: 0.88rem;
     line-height: 1.6;
-  }
-
-  /* Leaderboard */
-  .board {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
-  }
-  .board th {
-    text-align: left;
-    padding: 0.4rem 0.8rem;
-    color: var(--muted);
-    font-weight: 600;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    border-bottom: 2px solid var(--rule);
-  }
-  .board td {
-    padding: 0.5rem 0.8rem;
-    border-bottom: 1px solid var(--rule);
-    vertical-align: top;
-  }
-  .board tr:last-child td { border-bottom: none; }
-  .board tr:hover td { background: #f5f0e4; }
-  .rank { color: var(--muted); font-size: 0.8rem; }
-  .score-val { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
-  .tag {
-    display: inline-block;
-    font-size: 0.7rem;
-    padding: 0.1em 0.5em;
-    border-radius: 3px;
-    background: var(--code-bg);
-    color: var(--muted);
-    font-family: -apple-system, sans-serif;
-    letter-spacing: 0.04em;
-  }
-  .tag.protac { background: #e8f0eb; color: #2a6b3e; }
-  .tag.macro { background: #f0e8e8; color: #8b3a2a; }
-  .tag.ha { background: #e8eaf0; color: #2a3a6b; }
-
-  /* Progress bar */
-  .progress-wrap { margin: 1rem 0; }
-  .progress-label {
+    min-height: 100vh;
     display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    border-bottom: 1px solid var(--border);
+    background: rgba(247,246,241,0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 0.65rem 1.25rem;
+  }
+  .header-inner {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    font-family: -apple-system, sans-serif;
-    font-size: 0.82rem;
+    gap: 1rem;
+  }
+  .site-name {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    text-decoration: none;
+  }
+  .site-name span { color: var(--primary); }
+  .nav-links { display: flex; gap: 0.25rem; }
+  .nav-btn {
+    font-size: 0.8rem;
+    font-weight: 500;
     color: var(--muted);
-    margin-bottom: 0.3rem;
+    background: none;
+    border: none;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.12s, color 0.12s;
   }
-  .progress-bar {
-    height: 8px;
-    background: var(--rule);
-    border-radius: 4px;
+  .nav-btn:hover { background: var(--well); color: var(--fg); }
+
+  /* ── Main layout ── */
+  .page { flex: 1; }
+  .container { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
+
+  /* ── Hero card ── */
+  .hero-wrap { padding: 1.25rem 1.25rem 0; }
+  .hero {
+    background: var(--primary);
+    color: var(--primary-fg);
+    border-radius: 16px;
+    padding: 2rem 2rem 1.75rem;
+    position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 24px rgba(31,90,61,0.18);
   }
-  .progress-fill {
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.12;
+  }
+  .hero-content { position: relative; z-index: 1; }
+  .hero-headline {
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-family: var(--serif);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 1.25rem;
+    min-height: 2rem;
+  }
+  .hero-headline .beat { color: var(--accent); }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .hero-btn {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-fg);
+    border: none;
+    padding: 0.4rem 0.9rem;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.12s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  }
+  .hero-btn:hover { opacity: 0.85; }
+
+  /* Frontier progress */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(238,245,241,0.5);
+    margin-bottom: 0.5rem;
+  }
+  .frontier-wrap {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .frontier-bar-bg {
+    height: 6px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+  .frontier-bar-fill {
     height: 100%;
     background: var(--accent);
-    border-radius: 4px;
-    transition: width 0.5s ease;
+    border-radius: 3px;
+    transition: width 0.6s ease;
   }
+  .frontier-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: rgba(238,245,241,0.7);
+  }
+  .frontier-val { font-weight: 700; color: var(--primary-fg); }
 
   /* Score history chart */
-  .chart-wrap {
-    margin: 1rem 0 0.5rem;
-    background: var(--code-bg);
-    border-radius: 6px;
-    border: 1px solid var(--rule);
-    padding: 1rem 1.2rem 0.8rem;
+  .chart-panel {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 0.75rem 1rem 0.6rem;
+    backdrop-filter: blur(4px);
   }
-  .chart-title {
-    font-family: -apple-system, sans-serif;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+  .chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 0.5rem;
+  }
+  .chart-tabs { display: flex; gap: 0.35rem; }
+  .chart-tab {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    border: 1px solid rgba(238,245,241,0.3);
+    color: rgba(238,245,241,0.7);
+    background: none;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .chart-tab.active {
+    background: var(--primary-fg);
+    color: var(--primary);
+    border-color: var(--primary-fg);
   }
   .chart-svg { display: block; width: 100%; overflow: visible; }
   .chart-legend {
     display: flex;
-    gap: 1.2rem;
-    font-family: -apple-system, sans-serif;
-    font-size: 0.75rem;
-    color: var(--muted);
+    gap: 1rem;
+    font-size: 0.7rem;
+    color: rgba(238,245,241,0.55);
     margin-top: 0.4rem;
+    font-family: var(--mono);
   }
-  .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+  .legend-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    margin-right: 3px;
+    vertical-align: middle;
+  }
+  .legend-dash {
+    display: inline-block;
+    width: 14px; height: 2px;
+    border-radius: 1px;
+    margin-right: 3px;
+    vertical-align: middle;
+    background: rgba(238,245,241,0.4);
+  }
 
-  /* Stat cards */
-  .stats { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+  /* ── Below-hero content ── */
+  .below-hero { padding: 1.25rem 1.25rem 0; }
+  .cards { max-width: 72rem; margin: 0 auto; display: grid; gap: 1rem; }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .card-title {
+    font-size: 0.7rem;
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  /* Stats row */
+  .stats { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
   .stat {
     flex: 1;
-    min-width: 140px;
-    background: var(--code-bg);
-    border-radius: 6px;
-    padding: 0.8rem 1rem;
-    border: 1px solid var(--rule);
+    min-width: 100px;
+    background: var(--well);
+    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
   }
   .stat-val {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
+    color: var(--primary);
     line-height: 1.1;
+    font-variant-numeric: tabular-nums;
   }
   .stat-label {
-    font-family: -apple-system, sans-serif;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    margin-top: 0.2rem;
+    font-family: var(--mono);
+    margin-top: 0.15rem;
   }
+
+  /* Leaderboard table */
+  .board {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .board th {
+    text-align: left;
+    padding: 0.4rem 0.75rem;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 2px solid var(--border);
+    font-family: var(--mono);
+  }
+  .board td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .board tr:last-child td { border-bottom: none; }
+  .board tr:hover td { background: var(--well); }
+  .rank { color: var(--muted); font-size: 0.78rem; font-family: var(--mono); }
+  .score-val { font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; font-family: var(--mono); }
+  .badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    padding: 0.1em 0.5em;
+    border-radius: 4px;
+    background: var(--well);
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  /* SOTA table */
+  .sota-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); }
+  .sota-row:last-child { border-bottom: none; }
+  .sota-rank { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); width: 1.5rem; flex-shrink: 0; }
+  .sota-score { font-family: var(--mono); font-weight: 700; color: var(--primary); font-size: 0.9rem; width: 4.5rem; flex-shrink: 0; }
+  .sota-name { font-size: 0.875rem; font-weight: 500; flex: 1; }
+  .sota-cite { font-size: 0.75rem; color: var(--muted); }
+  .sota-you { background: rgba(76,175,125,0.1); border-radius: 6px; padding: 0.55rem 0.75rem; }
 
   /* Targets table */
   .targets {
     width: 100%;
     border-collapse: collapse;
-    font-family: "SF Mono", Menlo, Consolas, monospace;
-    font-size: 0.78rem;
-    margin-top: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
   }
   .targets th {
     text-align: left;
     padding: 0.3rem 0.6rem;
     color: var(--muted);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    border-bottom: 2px solid var(--rule);
-    font-family: -apple-system, sans-serif;
+    letter-spacing: 0.08em;
+    border-bottom: 2px solid var(--border);
+    font-family: var(--mono);
     font-weight: 600;
   }
   .targets td {
     padding: 0.35rem 0.6rem;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--border);
     word-break: break-all;
   }
-  .targets tr:hover td { background: #f5f0e4; }
+  .targets tr:hover td { background: var(--well); }
 
-  #loading { color: var(--muted); font-style: italic; font-family: -apple-system, sans-serif; font-size: 0.9rem; }
-  #error { color: var(--pop); font-family: -apple-system, sans-serif; font-size: 0.9rem; display: none; }
+  /* Code block */
+  pre {
+    background: var(--well);
+    border-radius: 8px;
+    padding: 1rem 1.1rem;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    border-left: 3px solid var(--primary);
+    color: var(--fg);
+  }
+  code { font-family: var(--mono); font-size: 0.85em; }
+
+  /* How it works steps */
+  .steps { display: grid; gap: 0.75rem; }
+  .step { display: flex; gap: 0.75rem; align-items: flex-start; }
+  .step-num {
+    flex-shrink: 0;
+    width: 1.5rem; height: 1.5rem;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--primary-fg);
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 0.1rem;
+    font-family: var(--mono);
+  }
+  .step-body { font-size: 0.9rem; line-height: 1.55; }
+  .step-body strong { color: var(--primary); }
+
+  /* Footer */
+  footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    padding: 1.25rem;
+  }
+  .footer-inner {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .footer-text { font-size: 0.82rem; color: var(--muted); }
+  .footer-links { display: flex; gap: 0.25rem; }
+  .footer-icon {
+    display: inline-flex;
+    width: 2rem; height: 2rem;
+    align-items: center; justify-content: center;
+    border-radius: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: background 0.12s, color 0.12s;
+  }
+  .footer-icon:hover { background: var(--well); color: var(--fg); }
+
+  /* Loading/error states */
+  #board-loading { color: var(--muted); font-size: 0.85rem; font-style: italic; padding: 0.5rem 0; }
+  #board-error { color: #c0392b; font-size: 0.85rem; display: none; }
+  #board-empty { color: var(--muted); font-size: 0.85rem; font-style: italic; display: none; }
+
+  @media (max-width: 640px) {
+    .hero { padding: 1.25rem; }
+    .hero-headline { font-size: 1.25rem; }
+    .nav-links { display: none; }
+    .sota-cite { display: none; }
+  }
 </style>
 </head>
 <body>
+
 <header>
-  <h1>RetroFail</h1>
-  <nav>
-    <a href="#how">How it works</a> &nbsp;·&nbsp;
-    <a href="#leaderboard">Leaderboard</a> &nbsp;·&nbsp;
-    <a href="#targets">Public targets</a> &nbsp;·&nbsp;
-    <a href="https://github.com/chainyoda/retrofail" target="_blank">GitHub</a>
-  </nav>
+  <div class="header-inner">
+    <a class="site-name" href="#">Retro<span>Fail</span></a>
+    <nav class="nav-links">
+      <a class="nav-btn" href="#how">How it works</a>
+      <a class="nav-btn" href="#sota">Will you beat Retro*?</a>
+      <a class="nav-btn" href="#participate">Participate</a>
+      <a class="nav-btn" href="https://github.com/chainyoda/retrofail" target="_blank">GitHub</a>
+    </nav>
+  </div>
 </header>
 
-<main>
+<div class="page">
 
-<p style="margin-top:1.5rem">
-  <strong>RetroFail</strong> is a benchmark for multi-step retrosynthesis: given a target molecule, find a synthesis route from commercially available starting materials. The task is hard — state-of-the-art systems solve under 90% of the test set.
-</p>
-<p>
-  Targets are the <strong>USPTO-190</strong> set from <a href="https://arxiv.org/abs/2006.15820" target="_blank">Chen et al. (Retro*, ICML 2020)</a>, the standard 190-molecule evaluation set used across the retrosynthesis literature. Submit your solver and see where it lands against published methods.
-</p>
+  <!-- Hero -->
+  <div class="hero-wrap">
+    <div class="hero">
+      <svg class="hero-bg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0" stop-color="#eef5f1" stop-opacity="0.35"/>
+            <stop offset="1" stop-color="#eef5f1" stop-opacity="0.05"/>
+          </linearGradient>
+        </defs>
+        <path d="M600,50 C500,80 350,120 300,200 C250,280 320,320 250,380" stroke="url(#g1)" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M700,0 C620,60 480,100 420,180 C360,260 400,310 320,400" stroke="url(#g1)" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M800,80 C720,120 600,140 540,220 C480,300 510,350 440,400" stroke="url(#g1)" stroke-width="6" fill="none" stroke-linecap="round"/>
+      </svg>
 
-<div class="chart-wrap" id="chart-wrap" style="display:none">
-  <div class="chart-title">Score history</div>
-  <svg class="chart-svg" id="score-chart" height="120"></svg>
-  <div class="chart-legend">
-    <span><span class="legend-dot" style="background:var(--accent)"></span>Submissions</span>
-    <span><span class="legend-dot" style="background:var(--pop)"></span>Best (promoted)</span>
-    <span><span class="legend-dot" style="background:#aaa;border-radius:0;width:18px;height:2px;vertical-align:middle"></span>Retro* SOTA 86.8%</span>
+      <div class="hero-content">
+        <div class="hero-headline" id="hero-headline">
+          Can you beat <span class="beat">Retro*</span>?
+        </div>
+        <div class="hero-actions">
+          <a class="hero-btn" href="#how">How it works</a>
+          <a class="hero-btn" href="#sota">Will you beat Retro*?</a>
+          <a class="hero-btn" href="#participate">Participate</a>
+        </div>
+
+        <div class="section-label">Frontier Progress</div>
+        <div class="frontier-wrap">
+          <div class="frontier-bar-bg">
+            <div class="frontier-bar-fill" id="frontier-fill" style="width:0%"></div>
+          </div>
+          <div class="frontier-labels">
+            <span id="frontier-left">Best solve rate: <span class="frontier-val" id="frontier-pct">—</span></span>
+            <span>Retro* SOTA: <span class="frontier-val">86.8%</span></span>
+          </div>
+        </div>
+
+        <div class="chart-panel">
+          <div class="chart-header">
+            <div class="section-label" style="margin-bottom:0">Score history</div>
+            <div class="chart-tabs">
+              <button class="chart-tab active">Best score</button>
+            </div>
+          </div>
+          <svg class="chart-svg" id="score-chart" height="140"></svg>
+          <div class="chart-legend">
+            <span><span class="legend-dot" style="background:rgba(238,245,241,0.5)"></span>All submissions</span>
+            <span><span class="legend-dot" style="background:#4caf7d"></span>Promoted</span>
+            <span><span class="legend-dash"></span>Retro* 86.8%</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<h2 id="how">How it works</h2>
-<p style="font-family:-apple-system,sans-serif;font-size:0.9rem;line-height:1.7">
-  Your solver receives a target molecule as a SMILES string and must return a tree of reactions tracing it back to commercially available starting materials. Each internal node is a reaction step; each leaf must appear in the building block catalog. Routes are validated by a pinned RDKit verifier — no partial credit, no manual review.
-</p>
-<p style="font-family:-apple-system,sans-serif;font-size:0.9rem;line-height:1.7">
-  Submissions are scored against all 190 targets on the server. A submission only appears on the leaderboard if it strictly beats the current best score.
-</p>
+  <!-- Cards -->
+  <div class="below-hero">
+    <div class="cards">
 
-<h2>Scoring</h2>
-<div class="formula">score = solve_rate<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ 0.10 &times; mean_route_efficiency<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&minus; 0.01 &times; mean_wall_clock_seconds</div>
+      <!-- Stats + Leaderboard -->
+      <div class="card" id="leaderboard">
+        <div class="card-title">Current leaderboard</div>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-val" id="best-score">—</div>
+            <div class="stat-label">Best score</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" id="best-solve">—</div>
+            <div class="stat-label">Solve rate</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" id="n-submissions">—</div>
+            <div class="stat-label">Submissions</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" id="n-promoted">—</div>
+            <div class="stat-label">Promoted</div>
+          </div>
+        </div>
+        <div id="board-loading">Loading leaderboard...</div>
+        <div id="board-error">Could not load leaderboard.</div>
+        <div id="board-empty">No promoted submissions yet. Be the first.</div>
+        <table class="board" id="board" style="display:none">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Score</th>
+              <th>Solve rate</th>
+              <th>Efficiency</th>
+              <th>Wall clock</th>
+              <th>Submitted by</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody id="board-body"></tbody>
+        </table>
+      </div>
 
-<p style="font-family:-apple-system,sans-serif;font-size:0.85rem;color:var(--muted);margin-top:0.6rem">
-  <code>solve_rate</code>: fraction of 190 targets with a valid route (dominates the score).
-  <code>route_efficiency</code>: 1 / depth per solved target, rewarding shorter routes.
-  <code>wall_clock</code>: mean seconds per target, penalizing slow solvers. 60s hard limit per target.
-</p>
+      <!-- How it works -->
+      <div class="card" id="how">
+        <div class="card-title">How it works</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body"><strong>Get a target.</strong> Your solver receives a molecule as a SMILES string from the USPTO-190 set — 190 hard multi-step druglike molecules from <a href="https://arxiv.org/abs/2006.15820" target="_blank" style="color:var(--primary)">Chen et al. (Retro*, ICML 2020)</a>.</div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body"><strong>Plan the route.</strong> Return a tree of reactions tracing the target back to commercially available starting materials. Each leaf must be in the building block catalog. Maximum 10 steps, 60-second budget per target.</div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body"><strong>Verify.</strong> A pinned RDKit verifier checks every SMILES, confirms the root product matches the target, validates leaf availability, and enforces the depth and time limits. No partial credit, no manual review.</div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body"><strong>Submit.</strong> Your solver is scored against all 190 hidden targets on the server. A submission only appears on the leaderboard if it strictly beats the current best score.</div>
+          </div>
+        </div>
+        <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border)">
+          <div class="card-title" style="margin-bottom:0.5rem">Scoring formula</div>
+          <pre>score = solve_rate
+       + 0.10 × mean_route_efficiency
+       − 0.01 × mean_wall_clock_seconds</pre>
+          <p style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem">
+            <code>solve_rate</code> dominates — it is the fraction of 190 targets with a valid route.
+            <code>route_efficiency</code> = 1/depth per solved target (shorter routes score higher).
+            <code>wall_clock</code> penalizes slow solvers.
+          </p>
+        </div>
+      </div>
 
-<h2>Current frontier</h2>
-<div id="stats-loading" class="stats">
-  <div class="stat"><div class="stat-val" id="best-score">—</div><div class="stat-label">Best score</div></div>
-  <div class="stat"><div class="stat-val" id="best-solve">—</div><div class="stat-label">Solve rate</div></div>
-  <div class="stat"><div class="stat-val" id="n-submissions">—</div><div class="stat-label">Submissions</div></div>
-  <div class="stat"><div class="stat-val" id="n-promoted">—</div><div class="stat-label">Promoted</div></div>
-</div>
+      <!-- Will you beat Retro* -->
+      <div class="card" id="sota">
+        <div class="card-title">Will you beat Retro*?</div>
+        <p style="font-size:0.875rem;color:var(--muted);margin-bottom:1rem">Published solve rates on USPTO-190. These are the numbers to beat.</p>
+        <div>
+          <div class="sota-row sota-you" id="sota-you" style="display:none">
+            <span class="sota-rank">★</span>
+            <span class="sota-score" id="sota-your-score">—</span>
+            <span class="sota-name" style="color:var(--primary);font-weight:600">Your best submission</span>
+            <span class="sota-cite"></span>
+          </div>
+          <div class="sota-row">
+            <span class="sota-rank">1</span>
+            <span class="sota-score">99.47%</span>
+            <span class="sota-name">RetroGraph</span>
+            <span class="sota-cite">Shi et al., 2020</span>
+          </div>
+          <div class="sota-row">
+            <span class="sota-rank">2</span>
+            <span class="sota-score">98.95%</span>
+            <span class="sota-name">PDVN + Retro*</span>
+            <span class="sota-cite">Liu et al., arXiv:2301.13755</span>
+          </div>
+          <div class="sota-row">
+            <span class="sota-rank">3</span>
+            <span class="sota-score">86.84%</span>
+            <span class="sota-name">Retro* (original)</span>
+            <span class="sota-cite">Chen et al., ICML 2020</span>
+          </div>
+          <div class="sota-row">
+            <span class="sota-rank">4</span>
+            <span class="sota-score">62.63%</span>
+            <span class="sota-name">MCTS</span>
+            <span class="sota-cite">Chen et al., ICML 2020</span>
+          </div>
+        </div>
+      </div>
 
-<div class="progress-wrap" id="progress-wrap" style="display:none">
-  <div class="progress-label">
-    <span>Solve rate</span>
-    <span id="progress-label-right">0 / 100</span>
-  </div>
-  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-</div>
-
-<h2 id="leaderboard">Leaderboard</h2>
-<span id="loading">Loading...</span>
-<span id="error">Could not load leaderboard — is the server running?</span>
-<table class="board" id="board" style="display:none">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Score</th>
-      <th>Solve rate</th>
-      <th>Efficiency</th>
-      <th>Wall clock</th>
-      <th>Submitted by</th>
-      <th>Note</th>
-    </tr>
-  </thead>
-  <tbody id="board-body"></tbody>
-</table>
-<p id="board-empty" style="display:none;color:var(--muted);font-style:italic;font-family:-apple-system,sans-serif;font-size:0.9rem">
-  No promoted submissions yet. Be the first.
-</p>
-
-<h2>Published SOTA</h2>
-<p style="font-family:-apple-system,sans-serif;font-size:0.85rem;color:var(--muted);margin-bottom:0.5rem">
-  Reference solve rates on USPTO-190. Beat these with your solver.
-</p>
-<table class="board">
-  <thead><tr><th>#</th><th>Score (solve rate)</th><th>Method</th><th>Citation</th></tr></thead>
-  <tbody>
-    <tr>
-      <td class="rank">1</td>
-      <td class="score-val">99.47%</td>
-      <td>RetroGraph</td>
-      <td style="font-size:0.8rem;color:var(--muted)">Shi et al., 2020</td>
-    </tr>
-    <tr>
-      <td class="rank">2</td>
-      <td class="score-val">98.95%</td>
-      <td>PDVN + Retro*</td>
-      <td style="font-size:0.8rem;color:var(--muted)">Liu et al., arXiv:2301.13755</td>
-    </tr>
-    <tr>
-      <td class="rank">3</td>
-      <td class="score-val">86.84%</td>
-      <td>Retro* (original)</td>
-      <td style="font-size:0.8rem;color:var(--muted)">Chen et al., ICML 2020</td>
-    </tr>
-    <tr>
-      <td class="rank">4</td>
-      <td class="score-val">62.63%</td>
-      <td>MCTS</td>
-      <td style="font-size:0.8rem;color:var(--muted)">Chen et al., ICML 2020</td>
-    </tr>
-  </tbody>
-</table>
-
-<h2 id="targets">Public targets <span style="font-weight:400;font-size:0.85rem;color:var(--muted)">(19 of 190)</span></h2>
-<p style="font-family:-apple-system,sans-serif;font-size:0.85rem;color:var(--muted)">
-  The full set (190 targets) is scored server-side. Target set SHA-256 prefix: <code id="hidden-hash">—</code>
-</p>
-<table class="targets" id="targets-table">
-  <thead><tr><th>ID</th><th>SMILES</th><th>Chemotype</th></tr></thead>
-  <tbody id="targets-body"></tbody>
-</table>
-
-<h2>Participate</h2>
-<pre><code># 1. Get an API key
+      <!-- Participate -->
+      <div class="card" id="participate">
+        <div class="card-title">Participate</div>
+        <pre><code># 1. Register
 curl https://retrofail-judge-production.up.railway.app/auth/register?name=yourname
 
-# 2. Clone the repo
+# 2. Clone
 git clone https://github.com/chainyoda/retrofail
-cd retrofail
+cd retrofail && ./setup.sh
 
-# 3. Install deps
-./setup.sh
+# 3. Edit solver/solve.py — implement solve(target_smiles) -> Route
 
-# 4. Edit solver/solve.py — implement solve(target_smiles) -> Route
-# 5. Test locally
+# 4. Test locally
 bash benchmark.sh
 
-# 6. Submit
-python3 cli/retrofail.py login &lt;api-key&gt; --api https://retrofail-judge-production.up.railway.app
-python3 cli/retrofail.py submit --note "approach description"</code></pre>
+# 5. Submit
+python3 cli/retrofail.py login &lt;api-key&gt; \
+  --api https://retrofail-judge-production.up.railway.app
+python3 cli/retrofail.py submit --note "describe your approach"</code></pre>
+      </div>
 
-<h2>Verifier</h2>
-<p>Every route is validated by a pinned RDKit-based verifier:</p>
-<ol style="font-family:-apple-system,sans-serif;font-size:0.9rem;line-height:1.8">
-  <li><strong>Parse.</strong> Every SMILES canonicalizes without error under a pinned RDKit version.</li>
-  <li><strong>Root match.</strong> The final step's product matches the target (canonical SMILES equality).</li>
-  <li><strong>Leaf availability.</strong> Every leaf reactant appears in the building block catalog.</li>
-  <li><strong>Depth bound.</strong> Route depth ≤ 10 steps.</li>
-  <li><strong>Budget.</strong> <code>solve()</code> returns within 60 seconds.</li>
-</ol>
-<p>A submission is rejected if its hidden-set score does not strictly exceed the current best.</p>
+      <!-- Public targets -->
+      <div class="card" id="targets">
+        <div class="card-title">Public targets <span style="font-weight:400;color:var(--muted)">(19 of 190) &nbsp;·&nbsp; SHA-256 prefix: <code id="hidden-hash">—</code></span></div>
+        <div style="overflow-x:auto">
+          <table class="targets" id="targets-table">
+            <thead><tr><th>ID</th><th>SMILES</th></tr></thead>
+            <tbody id="targets-body"></tbody>
+          </table>
+        </div>
+      </div>
 
-</main>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <p class="footer-text">A benchmark for multi-step retrosynthesis &nbsp;·&nbsp; <a href="https://github.com/chainyoda/retrofail" target="_blank" style="color:var(--fg);font-weight:500">chainyoda/retrofail</a></p>
+    <div class="footer-links">
+      <a class="footer-icon" href="https://github.com/chainyoda/retrofail" target="_blank" aria-label="GitHub">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
 
 <script>
-const API = '';
 const JUDGE = 'https://retrofail-judge-production.up.railway.app';
 
-function drawChart(allSubs) {
-  if (!allSubs || allSubs.length === 0) return;
-  const wrap = document.getElementById('chart-wrap');
+function drawChart(history) {
+  if (!history || history.length === 0) return;
   const svg = document.getElementById('score-chart');
-  wrap.style.display = 'block';
-
-  const W = svg.parentElement.clientWidth - 24; // account for padding
-  const H = 120;
-  const PAD = { top: 10, right: 12, bottom: 28, left: 38 };
+  const W = svg.parentElement.clientWidth - 32;
+  if (W <= 0) return;
+  const H = 140;
+  const PAD = { top: 12, right: 48, bottom: 28, left: 40 };
   const iW = W - PAD.left - PAD.right;
   const iH = H - PAD.top - PAD.bottom;
-
-  const SOTA = 0.8684; // Retro* solve rate (dominates score)
-  const sorted = [...allSubs].sort((a, b) => a.timestamp - b.timestamp);
+  const SOTA = 0.8684;
+  const sorted = [...history].sort((a, b) => a.timestamp - b.timestamp);
   const scores = sorted.map(s => s.score);
-  const minS = 0;
-  const maxS = Math.max(SOTA * 1.05, Math.max(...scores) * 1.1, 0.1);
-
+  const maxS = Math.max(SOTA * 1.08, Math.max(...scores) * 1.12, 0.1);
   const t0 = sorted[0].timestamp;
-  const t1 = sorted[sorted.length - 1].timestamp || t0 + 1;
-  const xScale = n => PAD.left + ((n - t0) / (t1 - t0 || 1)) * iW;
-  const yScale = v => PAD.top + iH - ((v - minS) / (maxS - minS)) * iH;
-
+  const t1 = sorted.length > 1 ? sorted[sorted.length - 1].timestamp : t0 + 1;
+  const xS = n => PAD.left + ((n - t0) / (t1 - t0 || 1)) * iW;
+  const yS = v => PAD.top + iH - (v / maxS) * iH;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('width', W);
-
-  let html = '';
-
-  // Grid lines + y-axis labels
-  const ticks = [0, 0.25, 0.5, 0.75, 1.0].filter(v => v <= maxS * 1.01);
-  ticks.forEach(v => {
-    const y = yScale(v);
-    html += `<line x1="${PAD.left}" y1="${y}" x2="${PAD.left + iW}" y2="${y}" stroke="#d9d0bc" stroke-width="1"/>`;
-    html += `<text x="${PAD.left - 4}" y="${y + 4}" text-anchor="end" font-size="9" font-family="SF Mono,Menlo,monospace" fill="#5c6b62">${(v * 100).toFixed(0)}%</text>`;
+  let h = '';
+  // Grid
+  [0, 0.25, 0.5, 0.75, 1.0].filter(v => v <= maxS).forEach(v => {
+    const y = yS(v);
+    h += `<line x1="${PAD.left}" y1="${y}" x2="${PAD.left+iW}" y2="${y}" stroke="rgba(238,245,241,0.1)" stroke-width="1"/>`;
+    h += `<text x="${PAD.left-5}" y="${y+4}" text-anchor="end" font-size="9" font-family="SF Mono,Menlo,monospace" fill="rgba(238,245,241,0.4)">${(v*100).toFixed(0)}%</text>`;
   });
-
-  // SOTA reference line
-  const sotaY = yScale(SOTA);
-  html += `<line x1="${PAD.left}" y1="${sotaY}" x2="${PAD.left + iW}" y2="${sotaY}" stroke="#aaa" stroke-width="1.5" stroke-dasharray="4 3"/>`;
-  html += `<text x="${PAD.left + iW + 3}" y="${sotaY + 4}" font-size="9" font-family="-apple-system,sans-serif" fill="#aaa">Retro*</text>`;
-
-  // All submissions as dots
+  // SOTA line
+  const sy = yS(SOTA);
+  h += `<line x1="${PAD.left}" y1="${sy}" x2="${PAD.left+iW}" y2="${sy}" stroke="rgba(238,245,241,0.4)" stroke-width="1.5" stroke-dasharray="5 3"/>`;
+  h += `<text x="${PAD.left+iW+4}" y="${sy+4}" font-size="9" font-family="-apple-system,sans-serif" fill="rgba(238,245,241,0.45)">Retro*</text>`;
+  // Dots
   sorted.forEach(s => {
-    const x = allSubs.length === 1 ? PAD.left + iW / 2 : xScale(s.timestamp);
-    const y = yScale(s.score);
-    html += `<circle cx="${x}" cy="${y}" r="3.5" fill="#1f5a3d" opacity="0.5"/>`;
+    const x = sorted.length === 1 ? PAD.left + iW/2 : xS(s.timestamp);
+    const y = yS(s.score);
+    h += `<circle cx="${x}" cy="${y}" r="3" fill="rgba(238,245,241,0.4)"/>`;
   });
-
-  // Promoted frontier line
+  // Promoted line + dots
   const promoted = sorted.filter(s => s.promoted);
   if (promoted.length > 1) {
     const pts = promoted.map(s => {
-      const x = allSubs.length === 1 ? PAD.left + iW / 2 : xScale(s.timestamp);
-      return `${x},${yScale(s.score)}`;
+      const x = sorted.length === 1 ? PAD.left + iW/2 : xS(s.timestamp);
+      return `${x},${yS(s.score)}`;
     }).join(' ');
-    html += `<polyline points="${pts}" fill="none" stroke="#e56b52" stroke-width="2"/>`;
+    h += `<polyline points="${pts}" fill="none" stroke="#4caf7d" stroke-width="2"/>`;
   }
   promoted.forEach(s => {
-    const x = allSubs.length === 1 ? PAD.left + iW / 2 : xScale(s.timestamp);
-    html += `<circle cx="${x}" cy="${yScale(s.score)}" r="4.5" fill="#e56b52"/>`;
+    const x = sorted.length === 1 ? PAD.left + iW/2 : xS(s.timestamp);
+    h += `<circle cx="${x}" cy="${yS(s.score)}" r="4.5" fill="#4caf7d"/>`;
   });
-
-  // X-axis date labels
+  // X-axis dates
   if (sorted.length > 1) {
-    [sorted[0], sorted[sorted.length - 1]].forEach((s, i) => {
-      const x = i === 0 ? PAD.left : PAD.left + iW;
+    [[sorted[0], 'start', PAD.left], [sorted[sorted.length-1], 'end', PAD.left+iW]].forEach(([s, anchor, x]) => {
       const d = new Date(s.timestamp * 1000);
-      const label = d.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
-      html += `<text x="${x}" y="${H - 4}" text-anchor="${i === 0 ? 'start' : 'end'}" font-size="9" font-family="-apple-system,sans-serif" fill="#5c6b62">${label}</text>`;
+      const lbl = d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+      h += `<text x="${x}" y="${H-4}" text-anchor="${anchor}" font-size="9" font-family="-apple-system,sans-serif" fill="rgba(238,245,241,0.4)">${lbl}</text>`;
     });
   }
-
-  svg.innerHTML = html;
+  svg.innerHTML = h;
 }
 
 async function loadLeaderboard() {
@@ -479,91 +709,70 @@ async function loadLeaderboard() {
     const r = await fetch(`${JUDGE}/leaderboard`);
     const data = await r.json();
     const board = data.leaderboard || [];
-    const allSubs = data.all_count || board.length;
-
-    document.getElementById('loading').style.display = 'none';
-
-    // Stats
-    if (board.length > 0) {
-      const best = board[0];
-      const m = best.metrics || {};
-      document.getElementById('best-score').textContent = best.score.toFixed(4);
-      document.getElementById('best-solve').textContent = ((m.solve_rate || 0) * 100).toFixed(0) + '%';
-      const pct = (m.solve_rate || 0) * 100;
-      document.getElementById('progress-fill').style.width = pct + '%';
-      document.getElementById('progress-label-right').textContent =
-        `${m.solved || 0} / ${m.total || 190}`;
-      document.getElementById('progress-wrap').style.display = 'block';
-    } else {
-      document.getElementById('best-score').textContent = '—';
-      document.getElementById('best-solve').textContent = '—';
-    }
-
     const history = data.history || [];
+
+    document.getElementById('board-loading').style.display = 'none';
     document.getElementById('n-submissions').textContent = history.length || '—';
     document.getElementById('n-promoted').textContent = board.length;
 
-    drawChart(history);
+    if (board.length > 0) {
+      const best = board[0];
+      const m = best.metrics || {};
+      const sr = (m.solve_rate || 0) * 100;
+      document.getElementById('best-score').textContent = best.score.toFixed(4);
+      document.getElementById('best-solve').textContent = sr.toFixed(0) + '%';
+      document.getElementById('frontier-fill').style.width = Math.min(sr / 86.84 * 100, 100) + '%';
+      document.getElementById('frontier-pct').textContent = sr.toFixed(1) + '%';
+      document.getElementById('hero-headline').innerHTML =
+        `<span id="hero-pct">${sr.toFixed(0)}%</span> of <span class="beat">Retro*</span>'s solve rate`;
+
+      // Show in SOTA table
+      const row = document.getElementById('sota-you');
+      row.style.display = 'flex';
+      document.getElementById('sota-your-score').textContent = sr.toFixed(1) + '%';
+    }
 
     if (board.length === 0) {
       document.getElementById('board-empty').style.display = 'block';
-      return;  // chart drawn above before this check
+    } else {
+      document.getElementById('board').style.display = 'table';
+      const tbody = document.getElementById('board-body');
+      tbody.innerHTML = '';
+      board.forEach((s, i) => {
+        const m = s.metrics || {};
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="rank">${i+1}</td>
+          <td class="score-val">${s.score.toFixed(4)}</td>
+          <td>${((m.solve_rate||0)*100).toFixed(0)}%</td>
+          <td>${(m.mean_route_efficiency||0).toFixed(3)}</td>
+          <td>${(m.mean_wall_clock_s||0).toFixed(1)}s</td>
+          <td><span class="badge">${s.user||'—'}</span></td>
+          <td style="font-size:0.8rem;color:var(--muted)">${s.note||''}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    document.getElementById('board').style.display = 'table';
-    const tbody = document.getElementById('board-body');
-    tbody.innerHTML = '';
-    board.forEach((s, i) => {
-      const m = s.metrics || {};
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="rank">${i + 1}</td>
-        <td class="score-val">${s.score.toFixed(4)}</td>
-        <td>${((m.solve_rate || 0) * 100).toFixed(0)}%</td>
-        <td>${(m.mean_route_efficiency || 0).toFixed(3)}</td>
-        <td>${(m.mean_wall_clock_s || 0).toFixed(1)}s</td>
-        <td>${s.user || '—'}</td>
-        <td style="color:var(--muted);font-size:0.82rem">${s.note || ''}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+    drawChart(history);
   } catch(e) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('error').style.display = 'block';
+    document.getElementById('board-loading').style.display = 'none';
+    document.getElementById('board-error').style.display = 'block';
   }
 }
 
 async function loadTargets() {
   try {
-    const r = await fetch(`${API}/api/targets`);
+    const r = await fetch('/api/targets');
     const data = await r.json();
     const tbody = document.getElementById('targets-body');
-    tbody.innerHTML = '';
     (data.targets || []).forEach(t => {
       const tr = document.createElement('tr');
-      const ct = t.chemotype || '';
-      let tagCls = 'tag';
-      if (ct.includes('macrocycle')) tagCls += ' macro';
-      else if (ct.includes('ha')) tagCls += ' ha';
-      else tagCls += ' protac';
-      tr.innerHTML = `
-        <td><strong>${t.id}</strong></td>
-        <td>${t.smiles}</td>
-        <td><span class="${tagCls}">${ct}</span></td>
-      `;
+      tr.innerHTML = `<td><strong>${t.id}</strong></td><td>${t.smiles}</td>`;
       tbody.appendChild(tr);
     });
     const mfr = data.manifest || {};
     if (mfr.hidden_sha256) document.getElementById('hidden-hash').textContent = mfr.hidden_sha256;
-  } catch(_) {}
-}
-
-async function loadStats() {
-  try {
-    const r = await fetch(`${API}/api/leaderboard`);
-    const data = await r.json();
-    const promoted = (data.leaderboard || []).length;
-    document.getElementById('n-promoted').textContent = promoted;
   } catch(_) {}
 }
 
