@@ -348,6 +348,51 @@
   }
   code { font-family: var(--mono); font-size: 0.85em; }
 
+  /* Terminal steps */
+  .terminal-steps { display: grid; gap: 0; }
+  .terminal-step {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .terminal-step:last-child { border-bottom: none; }
+  .step-idx {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    width: 1.2rem;
+    text-align: right;
+  }
+  .step-content { flex: 1; min-width: 0; }
+  .step-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--fg);
+    margin-bottom: 0.35rem;
+  }
+  .step-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+  .terminal {
+    background: #1a2420;
+    border-radius: 7px;
+    padding: 0.7rem 0.9rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    color: #c8d8cc;
+  }
+  .terminal .prompt { color: #4caf7d; user-select: none; }
+  .terminal .cmd { color: #eef5f1; }
+  .terminal .comment { color: #627069; }
+
   /* How it works steps */
   .steps { display: grid; gap: 0.75rem; }
   .step { display: flex; gap: 0.75rem; align-items: flex-start; }
@@ -596,22 +641,66 @@
       <!-- Participate -->
       <div class="card" id="participate">
         <div class="card-title">Participate</div>
-        <pre><code># 1. Register
-curl https://retrofail-judge-production.up.railway.app/auth/register?name=yourname
+        <p style="font-size:0.875rem;color:var(--muted);margin-bottom:1rem">Clone the benchmark repo, improve the solver locally, and measure your score with the RetroFail CLI. Submit to get your score verified and appear on the leaderboard.</p>
+        <div class="terminal-steps">
 
-# 2. Clone
-git clone https://github.com/chainyoda/retrofail
-cd retrofail && ./setup.sh
+          <div class="terminal-step">
+            <span class="step-idx">1</span>
+            <div class="step-content">
+              <div class="step-title">Get an API key</div>
+              <div class="step-desc">Register a username to receive your API key. Keys are shown once — save it.</div>
+              <div class="terminal">
+                <span class="comment"># replace "yourname" with your username</span><br>
+                <span class="prompt">$ </span><span class="cmd">curl "https://retrofail-judge-production.up.railway.app/auth/register?name=yourname"</span>
+              </div>
+            </div>
+          </div>
 
-# 3. Edit solver/solve.py — implement solve(target_smiles) -> Route
+          <div class="terminal-step">
+            <span class="step-idx">2</span>
+            <div class="step-content">
+              <div class="step-title">Clone and install</div>
+              <div class="step-desc">Clone the benchmark repo and install dependencies (Python 3.10+, RDKit).</div>
+              <div class="terminal">
+                <span class="prompt">$ </span><span class="cmd">git clone https://github.com/chainyoda/retrofail</span><br>
+                <span class="prompt">$ </span><span class="cmd">cd retrofail && ./setup.sh</span>
+              </div>
+            </div>
+          </div>
 
-# 4. Test locally
-bash benchmark.sh
+          <div class="terminal-step">
+            <span class="step-idx">3</span>
+            <div class="step-content">
+              <div class="step-title">Improve the solver</div>
+              <div class="step-desc">Edit <code>solver/solve.py</code> and implement <code>solve(target_smiles: str) -&gt; dict | None</code>. Return a route tree or <code>None</code> if unsolvable.</div>
+            </div>
+          </div>
 
-# 5. Submit
-python3 cli/retrofail.py login &lt;api-key&gt; \
-  --api https://retrofail-judge-production.up.railway.app
-python3 cli/retrofail.py submit --note "describe your approach"</code></pre>
+          <div class="terminal-step">
+            <span class="step-idx">4</span>
+            <div class="step-content">
+              <div class="step-title">Test locally</div>
+              <div class="step-desc">Run against the 19 public targets. Check <code>score.json</code> for your local score.</div>
+              <div class="terminal">
+                <span class="prompt">$ </span><span class="cmd">bash benchmark.sh</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="terminal-step">
+            <span class="step-idx">5</span>
+            <div class="step-content">
+              <div class="step-title">Submit</div>
+              <div class="step-desc">Log in with your API key and submit. Your solver runs against all 190 hidden targets on the server. Only promoted if it strictly beats the current best.</div>
+              <div class="terminal">
+                <span class="prompt">$ </span><span class="cmd">python3 cli/retrofail.py login &lt;api-key&gt; \</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">--api https://retrofail-judge-production.up.railway.app</span><br>
+                <span class="prompt">$ </span><span class="cmd">python3 cli/retrofail.py submit --note "describe your approach"</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
 
       <!-- Public targets -->
